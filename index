@@ -1,14 +1,16 @@
-<!-- start SEKTION 1: KORT TESTVERSION DIGITAL TIPSRUNDA MED KARTA -->
+<!-- start SEKTION 1: DIGITAL TIPSRUNDA REN VERSION -->
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Digital tipsrunda test</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Digital tipsrunda</title>
 
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
   <style>
+    * { box-sizing: border-box; }
+
     body {
       margin: 0;
       font-family: Arial, sans-serif;
@@ -19,13 +21,13 @@
     header {
       background: #1f2937;
       color: white;
-      padding: 16px;
+      padding: 18px;
       text-align: center;
     }
 
     header h1 {
       margin: 0 0 6px;
-      font-size: 26px;
+      font-size: 28px;
     }
 
     header p {
@@ -47,6 +49,8 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.12);
     }
 
+    .hidden { display: none; }
+
     button {
       border: none;
       border-radius: 10px;
@@ -58,31 +62,13 @@
       color: white;
     }
 
-    button.secondary {
-      background: #6b7280;
-    }
+    button.success { background: #16a34a; }
+    button.secondary { background: #6b7280; }
+    button.danger { background: #dc2626; }
+    button.small { padding: 8px 10px; font-size: 14px; }
 
-    button.danger {
-      background: #dc2626;
-    }
-
-    button.success {
-      background: #16a34a;
-    }
-
-    button.small {
-      padding: 8px 10px;
-      font-size: 14px;
-    }
-
-    button:disabled {
-      opacity: 0.55;
-      cursor: not-allowed;
-    }
-
-    input, textarea, select {
+    input, textarea {
       width: 100%;
-      box-sizing: border-box;
       padding: 10px;
       margin: 6px 0 12px;
       border-radius: 8px;
@@ -94,87 +80,24 @@
       font-weight: bold;
     }
 
-    #map,
+    #teacherMap,
     #studentMap {
-      height: 430px;
+      height: 420px;
       border-radius: 14px;
-      margin-bottom: 16px;
       border: 2px solid #d1d5db;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    .station-card {
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      padding: 12px;
-      margin-bottom: 10px;
-      background: #fafafa;
-    }
-
-    .station-card h3 {
-      margin-top: 0;
-    }
-
-    .answer-btn {
-      display: block;
-      width: 100%;
-      margin: 8px 0;
-      background: #374151;
-      text-align: left;
+      margin: 12px 0 16px;
     }
 
     .message {
       padding: 12px;
       border-radius: 10px;
+      margin: 10px 0;
       background: #e0f2fe;
-      margin-top: 10px;
-      margin-bottom: 10px;
     }
 
-    .warning {
-      background: #fef3c7;
-    }
-
-    .correct {
-      background: #dcfce7;
-    }
-
-    .wrong {
-      background: #fee2e2;
-    }
-
-    .locked {
-      background: #f3f4f6;
-      color: #4b5563;
-    }
-
-    .map-status {
-      font-weight: bold;
-      padding: 10px;
-      border-radius: 10px;
-      background: #f3f4f6;
-      margin-bottom: 10px;
-    }
-
-    .save-status {
-      font-weight: bold;
-      padding: 10px;
-      border-radius: 10px;
-      background: #eef2ff;
-      margin-top: 10px;
-      margin-bottom: 10px;
-    }
-
-    .student-map-help {
-      font-weight: bold;
-      padding: 12px;
-      border-radius: 10px;
-      background: #ecfeff;
-      margin-bottom: 12px;
-    }
+    .warning { background: #fef3c7; }
+    .ok { background: #dcfce7; }
+    .bad { background: #fee2e2; }
 
     .grid-2 {
       display: grid;
@@ -182,275 +105,197 @@
       gap: 12px;
     }
 
-    .radio-row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin: 6px 0 14px;
+    .card {
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 10px;
+      background: #fafafa;
     }
 
-    .radio-choice {
+    .answer-btn {
+      display: block;
+      width: 100%;
+      background: #374151;
+      text-align: left;
+      margin: 8px 0;
+    }
+
+    .answer-saved {
+      padding: 10px;
+      border-radius: 10px;
+      background: #dbeafe;
+      border: 1px solid #93c5fd;
+      font-weight: bold;
+    }
+
+    .radio-row {
       display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 10px 12px;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 8px 0 14px;
+    }
+
+    .radio-row label {
       border: 1px solid #d1d5db;
       border-radius: 10px;
+      padding: 10px 12px;
       background: #f9fafb;
       font-weight: normal;
       cursor: pointer;
     }
 
-    .radio-choice input {
+    .radio-row input {
       width: auto;
-      margin: 0;
+      margin: 0 6px 0 0;
     }
 
-    .stats-box {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-
-    .stat {
-      background: #f3f4f6;
-      border-radius: 12px;
-      padding: 12px;
-      text-align: center;
-    }
-
-    .stat strong {
-      display: block;
-      font-size: 20px;
-      margin-bottom: 4px;
-    }
-
-    .muted {
-      color: #6b7280;
-      font-size: 14px;
-    }
-
-    .route-row {
-      font-size: 14px;
-      padding: 6px 0;
-      border-bottom: 1px solid #e5e7eb;
-    }
-
-    .start-box {
-      text-align: center;
-    }
-
-    .student-progress {
+    .statusbar {
       font-weight: bold;
       padding: 12px;
       border-radius: 10px;
       background: #eef2ff;
-      margin-bottom: 12px;
-    }
-
-    .selected-answer {
-      background: #dbeafe;
-      border: 1px solid #93c5fd;
-      border-radius: 10px;
-      padding: 10px;
-      margin-top: 8px;
-      font-weight: bold;
-    }
-
-    .login-box {
-      max-width: 420px;
-      margin: 0 auto;
-    }
-
-    .route-manager-card {
-      border: 1px solid #e5e7eb;
-      border-radius: 12px;
-      background: #f9fafb;
-      padding: 12px;
       margin-bottom: 10px;
     }
 
-    .active-badge {
+    .active {
       display: inline-block;
       background: #16a34a;
       color: white;
-      padding: 4px 8px;
+      padding: 3px 8px;
       border-radius: 999px;
       font-size: 13px;
-      font-weight: bold;
       margin-left: 6px;
     }
 
+    .copybox {
+      width: 100%;
+      min-height: 70px;
+      font-size: 13px;
+    }
+
     @media (max-width: 700px) {
-      .grid-2 {
-        grid-template-columns: 1fr;
-      }
-
-      .stats-box {
-        grid-template-columns: 1fr;
-      }
-
-      #map,
-      #studentMap {
-        height: 360px;
-      }
-
-      button {
-        width: 100%;
-        margin: 4px 0;
-      }
+      .grid-2 { grid-template-columns: 1fr; }
+      button { width: 100%; margin: 4px 0; }
+      #teacherMap, #studentMap { height: 360px; }
     }
   </style>
 </head>
 
 <body>
   <header>
-    <h1>Digital tipsrunda – testversion</h1>
-    <p>Skapa, spara och välj aktiv bana för elever</p>
+    <h1>Digital tipsrunda</h1>
+    <p>Geotaggad tipsrunda med karta, GPS och självrättning</p>
   </header>
 
   <main>
     <section id="startView">
-      <div class="panel start-box">
-        <h2>Välj läge</h2>
-        <p>Elever startar tipsrundan. Lärarläget kräver lösenord.</p>
+      <div class="panel">
+        <h2>Start</h2>
+        <p>Välj elevläge eller lärarläge.</p>
         <button class="success" onclick="showStudentStart()">Starta som elev</button>
         <button class="secondary" onclick="showTeacherLogin()">Lärarläge</button>
+        <div id="systemStatus" class="message"></div>
       </div>
     </section>
 
     <section id="teacherLoginView" class="hidden">
-      <div class="panel login-box">
+      <div class="panel">
         <h2>Lärarinloggning</h2>
-        <p>Skriv lärarlösenord för att öppna frågebyggaren.</p>
-
         <label>Lösenord</label>
-        <input id="teacherPasswordInput" type="password" placeholder="Skriv lösenord">
-
-        <button class="success" onclick="checkTeacherPassword()">Logga in</button>
+        <input id="teacherPassword" type="password" placeholder="Skriv lösenord" />
+        <button class="success" onclick="loginTeacher()">Logga in</button>
         <button class="secondary" onclick="showStart()">Tillbaka</button>
-
-        <div id="loginMessage"></div>
+        <div id="loginStatus"></div>
       </div>
     </section>
 
     <section id="teacherView" class="hidden">
       <div class="panel">
         <button class="secondary" onclick="showStart()">Till startsidan</button>
-        <button class="danger" onclick="resetEverything()">Rensa alla banor</button>
+        <button class="danger" onclick="clearAllRoutes()">Rensa alla sparade banor</button>
       </div>
 
       <div class="panel">
-        <h2>Bana</h2>
+        <h2>Banor</h2>
 
         <label>Namn på bana</label>
-        <input id="routeNameInput" placeholder="Exempel: Hygienrunda kök">
+        <input id="routeName" placeholder="Exempel: Hygienrunda kök" />
 
-        <button class="success" onclick="saveCurrentRoute(true)">Spara bana och gör aktiv</button>
-        <button class="secondary" onclick="saveCurrentRoute(false)">Spara bana</button>
-        <button class="secondary" onclick="createNewRoute()">Skapa ny tom bana</button>
+        <button class="success" onclick="saveRoute(true)">Spara bana och gör aktiv</button>
+        <button class="secondary" onclick="saveRoute(false)">Spara bana</button>
+        <button class="secondary" onclick="newRoute()">Ny tom bana</button>
 
-        <div id="saveStatus" class="save-status">
-          Ingen bana sparad ännu.
-        </div>
+        <div id="saveStatus" class="statusbar">Ingen bana laddad.</div>
 
-        <h3>Sparade banor</h3>
-        <div id="routeManager"></div>
+        <h3>Elevlänk till aktiv bana</h3>
+        <p>Efter att du sparat en bana som aktiv kan du skapa en elevlänk. Den länken innehåller banan så eleverna kan öppna den på sina mobiler.</p>
+        <button class="success" onclick="makeStudentLink()">Skapa elevlänk för aktiv bana</button>
+        <textarea id="studentLinkBox" class="copybox" readonly placeholder="Här kommer elevlänken..."></textarea>
+
+        <h3>Sparade banor på denna dator</h3>
+        <div id="routeList"></div>
       </div>
 
       <div class="panel">
-        <h2>Lärarläge – skapa fråga</h2>
-        <p>Varje fråga får en egen plats på kartan. Klicka på kartan eller använd kartans mittpunkt. Den blå markören kan flyttas efteråt.</p>
+        <h2>Skapa fråga</h2>
+        <div id="mapStatus" class="statusbar">Välj plats för frågan.</div>
 
-        <div class="map-status" id="mapStatus">
-          Välj plats för frågan.
-        </div>
-
-        <button class="success" onclick="activatePlacement()">Markera punkt på kartan</button>
+        <button class="success" onclick="activateMapClick()">Markera punkt på kartan</button>
         <button class="secondary" onclick="useMapCenter()">Använd kartans mittpunkt</button>
-        <button class="secondary" onclick="centerMapOnMyPosition()">Centrera på min position</button>
+        <button class="secondary" onclick="centerTeacherMapOnMe()">Centrera på min position</button>
 
-        <div id="map"></div>
+        <div id="teacherMap"></div>
 
         <div class="grid-2">
           <div>
-            <label>Frågans plats / station</label>
-            <input id="stationTitle" placeholder="Exempel: Station 1 - Entrén">
+            <label>Frågans plats/station</label>
+            <input id="qTitle" placeholder="Exempel: Station 1 - Entrén" />
           </div>
-
           <div>
             <label>Radie i meter</label>
-            <input id="stationRadius" type="number" value="25">
+            <input id="qRadius" type="number" value="25" />
           </div>
         </div>
 
         <div class="grid-2">
           <div>
             <label>Latitud</label>
-            <input id="stationLat" readonly>
+            <input id="qLat" readonly />
           </div>
-
           <div>
             <label>Longitud</label>
-            <input id="stationLng" readonly>
+            <input id="qLng" readonly />
           </div>
         </div>
 
         <label>Fråga</label>
-        <textarea id="stationQuestion" rows="3" placeholder="Skriv frågan här"></textarea>
+        <textarea id="qText" rows="3" placeholder="Skriv frågan här"></textarea>
 
         <label>Svar 1</label>
-        <input id="optionA" placeholder="Svarsalternativ 1">
+        <input id="qA" placeholder="Svarsalternativ 1" />
 
         <label>Svar 2</label>
-        <input id="optionB" placeholder="Svarsalternativ 2">
+        <input id="qB" placeholder="Svarsalternativ 2" />
 
         <label>Svar 3</label>
-        <input id="optionC" placeholder="Svarsalternativ 3">
+        <input id="qC" placeholder="Svarsalternativ 3" />
 
-        <label>Vilket alternativ är rätt?</label>
+        <label>Rätt svar</label>
         <div class="radio-row">
-          <label class="radio-choice">
-            <input type="radio" name="correctAnswer" value="0" checked>
-            Svar 1
-          </label>
-          <label class="radio-choice">
-            <input type="radio" name="correctAnswer" value="1">
-            Svar 2
-          </label>
-          <label class="radio-choice">
-            <input type="radio" name="correctAnswer" value="2">
-            Svar 3
-          </label>
+          <label><input type="radio" name="correct" value="0" checked /> Svar 1</label>
+          <label><input type="radio" name="correct" value="1" /> Svar 2</label>
+          <label><input type="radio" name="correct" value="2" /> Svar 3</label>
         </div>
 
         <button class="success" onclick="addQuestion()">Lägg till fråga</button>
-        <button class="secondary" onclick="clearForm()">Töm frågeformulär</button>
+        <button class="secondary" onclick="clearQuestionForm()">Töm frågeformulär</button>
       </div>
 
       <div class="panel">
-        <h2>Översikt för aktuell bana</h2>
-        <div class="stats-box">
-          <div class="stat">
-            <strong id="questionCount">0</strong>
-            Frågor
-          </div>
-          <div class="stat">
-            <strong id="routeLength">0 m</strong>
-            Ungefärlig bana
-          </div>
-          <div class="stat">
-            <strong id="averageDistance">0 m</strong>
-            Snitt mellan frågor
-          </div>
-        </div>
-        <div id="routeDetails"></div>
-      </div>
-
-      <div class="panel">
-        <h2>Tillagda frågor i aktuell bana</h2>
-        <div id="stationList"></div>
+        <h2>Aktuell bana</h2>
+        <div id="routeStats" class="message">Inga frågor tillagda.</div>
+        <div id="questionList"></div>
       </div>
     </section>
 
@@ -461,39 +306,36 @@
 
       <div class="panel">
         <h2>Elevläge</h2>
-        <p id="activeRouteStudentText">Laddar aktiv bana...</p>
+        <div id="studentRouteInfo" class="message"></div>
 
         <label>Namn</label>
-        <input id="studentName" placeholder="Skriv ditt namn">
+        <input id="studentName" placeholder="Skriv ditt namn" />
 
         <label>Klass</label>
-        <input id="studentClass" placeholder="Skriv din klass">
+        <input id="studentClass" placeholder="Skriv din klass" />
 
-        <button class="success" onclick="startStudentRound()">Starta tipsrundan</button>
-
-        <div id="studentStartMessage"></div>
+        <button class="success" onclick="startRound()">Starta tipsrundan</button>
+        <div id="studentStartStatus"></div>
       </div>
     </section>
 
     <section id="studentView" class="hidden">
       <div class="panel">
         <h2>Tipsrundan</h2>
-        <div id="studentStatus" class="student-progress">Startar GPS...</div>
-        <div id="studentInfoBox"></div>
+        <div id="studentStatus" class="statusbar">Startar...</div>
+        <div id="studentIdentity"></div>
       </div>
 
       <div class="panel">
-        <h2>Karta till nästa fråga</h2>
-        <div id="studentMapHelp" class="student-map-help">
-          Kartan visar din position och vägen fågelvägen till nästa obesvarade fråga.
-        </div>
+        <h2>Karta</h2>
+        <div id="studentMapHelp" class="message">Kartan visar din position och nästa fråga.</div>
         <button class="secondary" onclick="centerStudentMap()">Centrera kartan</button>
         <div id="studentMap"></div>
       </div>
 
       <div class="panel">
         <h2>Frågor</h2>
-        <div id="studentStations"></div>
+        <div id="studentQuestions"></div>
       </div>
 
       <div class="panel">
@@ -506,310 +348,259 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <script>
-    const STORAGE_KEY = "digitalTipsrundaRoutesV2";
+    const STORAGE_KEY = "digital_tipsrunda_clean_v1";
     const TEACHER_PASSWORD = "1234";
 
-    let appState = loadAppState();
-    let currentRouteId = null;
-    let workingStations = [];
+    let state = loadState();
+    let editingRouteId = null;
+    let workingQuestions = [];
+    let sharedRoute = readRouteFromUrl();
     let answers = {};
-    let map = null;
-    let markers = [];
-    let tempMarker = null;
-    let routeLine = null;
-    let studentPosition = null;
-    let studentWatchId = null;
-    let placementActive = false;
     let studentStarted = false;
+    let studentPosition = null;
+    let gpsWatchId = null;
+
+    let teacherMap = null;
+    let teacherMarkers = [];
+    let teacherRouteLine = null;
+    let tempMarker = null;
+    let mapClickActive = false;
 
     let studentMap = null;
+    let studentMarkers = [];
     let studentUserMarker = null;
-    let studentTargetMarker = null;
-    let studentRouteLine = null;
-    let studentQuestionMarkers = [];
+    let studentLine = null;
 
-    function loadAppState() {
-      const fallback = {
-        routes: [],
-        activeRouteId: null
-      };
-
+    function loadState() {
       try {
         const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
-        if (!saved || !Array.isArray(saved.routes)) return fallback;
-        return {
-          routes: saved.routes,
-          activeRouteId: saved.activeRouteId || null
-        };
-      } catch (error) {
-        return fallback;
-      }
+        if (saved && Array.isArray(saved.routes)) return saved;
+      } catch (e) {}
+      return { routes: [], activeRouteId: null };
     }
 
-    function saveAppState() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     }
 
-    function getRouteById(id) {
-      return appState.routes.find(function(route) {
-        return route.id === id;
+    function showOnly(id) {
+      ["startView","teacherLoginView","teacherView","studentStartView","studentView"].forEach(function(viewId) {
+        document.getElementById(viewId).classList.add("hidden");
       });
-    }
-
-    function getActiveRoute() {
-      return getRouteById(appState.activeRouteId);
-    }
-
-    function getActiveStations() {
-      const activeRoute = getActiveRoute();
-      return activeRoute ? activeRoute.stations : [];
-    }
-
-    function hideAllViews() {
-      document.getElementById("startView").classList.add("hidden");
-      document.getElementById("teacherLoginView").classList.add("hidden");
-      document.getElementById("teacherView").classList.add("hidden");
-      document.getElementById("studentStartView").classList.add("hidden");
-      document.getElementById("studentView").classList.add("hidden");
+      document.getElementById(id).classList.remove("hidden");
     }
 
     function showStart() {
-      hideAllViews();
-      document.getElementById("startView").classList.remove("hidden");
-      stopStudentGps();
+      stopGps();
+      showOnly("startView");
+      renderSystemStatus();
     }
 
     function showTeacherLogin() {
-      hideAllViews();
-      document.getElementById("teacherLoginView").classList.remove("hidden");
-      document.getElementById("teacherPasswordInput").value = "";
-      document.getElementById("loginMessage").innerHTML = "";
-      stopStudentGps();
-    }
-
-    function checkTeacherPassword() {
-      const password = document.getElementById("teacherPasswordInput").value;
-
-      if (password === TEACHER_PASSWORD) {
-        showTeacher();
-      } else {
-        document.getElementById("loginMessage").innerHTML = "<div class='message wrong'>Fel lösenord.</div>";
-      }
+      stopGps();
+      showOnly("teacherLoginView");
+      document.getElementById("teacherPassword").value = "";
+      document.getElementById("loginStatus").innerHTML = "";
     }
 
     function showTeacher() {
-      hideAllViews();
-      document.getElementById("teacherView").classList.remove("hidden");
-      stopStudentGps();
+      stopGps();
+      showOnly("teacherView");
 
-      if (!currentRouteId && appState.activeRouteId) {
-        loadRouteForEditing(appState.activeRouteId, false);
+      if (!editingRouteId && state.activeRouteId) {
+        loadRoute(state.activeRouteId, false);
       }
 
-      renderRouteManager();
-      renderStationList();
-      renderRouteInfo();
+      renderRouteList();
+      renderQuestionList();
+      renderRouteStats();
 
-      setTimeout(initMap, 100);
+      setTimeout(function() {
+        initTeacherMap();
+        renderTeacherMap();
+      }, 100);
     }
 
     function showStudentStart() {
-      hideAllViews();
-      document.getElementById("studentStartView").classList.remove("hidden");
-      stopStudentGps();
-      renderStudentStartActiveRoute();
+      stopGps();
+      showOnly("studentStartView");
+      renderStudentRouteInfo();
     }
 
-    function renderStudentStartActiveRoute() {
-      const activeRoute = getActiveRoute();
-      const textBox = document.getElementById("activeRouteStudentText");
-      const messageBox = document.getElementById("studentStartMessage");
-
-      if (!activeRoute) {
-        textBox.innerHTML = "Det finns ingen aktiv bana just nu.";
-        messageBox.innerHTML = "<div class='message warning'>Be läraren välja en aktiv bana först.</div>";
-        return;
-      }
-
-      textBox.innerHTML = `
-        Aktiv bana: <strong>${escapeHtml(activeRoute.name)}</strong><br>
-        Antal frågor: <strong>${activeRoute.stations.length}</strong>
-      `;
-
-      messageBox.innerHTML = "";
-    }
-
-    function showStudentRound() {
-      hideAllViews();
-      document.getElementById("studentView").classList.remove("hidden");
-      renderStudentInfo();
-      renderStudentStations();
+    function showStudentView() {
+      showOnly("studentView");
+      renderStudentIdentity();
+      renderStudentQuestions();
       renderResult();
 
       setTimeout(function() {
         initStudentMap();
-        updateStudentMap();
-      }, 150);
+        renderStudentMap();
+      }, 100);
     }
 
-    function createNewRoute() {
-      if (workingStations.length > 0) {
-        const ok = confirm("Du har frågor i aktuell bana. Vill du skapa en ny tom bana utan att spara först?");
-        if (!ok) return;
+    function renderSystemStatus() {
+      const box = document.getElementById("systemStatus");
+      const leafletStatus = typeof L !== "undefined" ? "Karta laddad." : "Karta kunde inte laddas. Kontrollera internetanslutning.";
+      const route = getStudentRoute();
+
+      box.innerHTML = `
+        <strong>Status:</strong> ${leafletStatus}<br>
+        <strong>Aktiv bana:</strong> ${route ? escapeHtml(route.name) : "Ingen aktiv bana"}
+      `;
+    }
+
+    function loginTeacher() {
+      const pw = document.getElementById("teacherPassword").value;
+      if (pw === TEACHER_PASSWORD) {
+        showTeacher();
+      } else {
+        document.getElementById("loginStatus").innerHTML = "<div class='message bad'>Fel lösenord.</div>";
+      }
+    }
+
+    function getRoute(id) {
+      return state.routes.find(function(route) { return route.id === id; });
+    }
+
+    function getActiveRoute() {
+      return getRoute(state.activeRouteId);
+    }
+
+    function getStudentRoute() {
+      return sharedRoute || getActiveRoute();
+    }
+
+    function newRoute() {
+      if (workingQuestions.length > 0) {
+        if (!confirm("Skapa ny tom bana utan att spara nuvarande ändringar?")) return;
       }
 
-      currentRouteId = null;
-      workingStations = [];
-      document.getElementById("routeNameInput").value = "";
-      document.getElementById("saveStatus").innerHTML = "Ny tom bana skapad. Lägg till frågor och klicka sedan Spara bana.";
-      clearForm();
-      renderStationList();
-      renderMarkers();
-      renderRouteInfo();
-      renderRouteLine();
+      editingRouteId = null;
+      workingQuestions = [];
+      document.getElementById("routeName").value = "";
+      document.getElementById("saveStatus").textContent = "Ny tom bana skapad.";
+      document.getElementById("studentLinkBox").value = "";
+      clearQuestionForm();
+      renderQuestionList();
+      renderRouteStats();
+      renderTeacherMap();
     }
 
-    function saveCurrentRoute(makeActive) {
-      const name = document.getElementById("routeNameInput").value.trim();
+    function saveRoute(makeActive) {
+      const name = document.getElementById("routeName").value.trim();
 
       if (!name) {
-        document.getElementById("saveStatus").innerHTML = "<span style='color:#b91c1c;'>Skriv ett namn på banan innan du sparar.</span>";
+        document.getElementById("saveStatus").textContent = "Skriv ett namn på banan innan du sparar.";
         return;
       }
 
-      if (workingStations.length === 0) {
-        document.getElementById("saveStatus").innerHTML = "<span style='color:#b91c1c;'>Lägg till minst en fråga innan du sparar banan.</span>";
+      if (workingQuestions.length === 0) {
+        document.getElementById("saveStatus").textContent = "Lägg till minst en fråga innan du sparar.";
         return;
       }
 
-      const now = new Date().toISOString();
-
-      if (!currentRouteId) {
-        currentRouteId = "route-" + Date.now();
-        appState.routes.push({
-          id: currentRouteId,
-          name,
-          stations: deepClone(workingStations),
-          createdAt: now,
-          updatedAt: now
+      if (!editingRouteId) {
+        editingRouteId = "route_" + Date.now();
+        state.routes.push({
+          id: editingRouteId,
+          name: name,
+          questions: clone(workingQuestions)
         });
       } else {
-        const existingRoute = getRouteById(currentRouteId);
-
-        if (existingRoute) {
-          existingRoute.name = name;
-          existingRoute.stations = deepClone(workingStations);
-          existingRoute.updatedAt = now;
-        } else {
-          appState.routes.push({
-            id: currentRouteId,
-            name,
-            stations: deepClone(workingStations),
-            createdAt: now,
-            updatedAt: now
-          });
+        const route = getRoute(editingRouteId);
+        if (route) {
+          route.name = name;
+          route.questions = clone(workingQuestions);
         }
       }
 
-      if (makeActive || !appState.activeRouteId) {
-        appState.activeRouteId = currentRouteId;
+      if (makeActive || !state.activeRouteId) {
+        state.activeRouteId = editingRouteId;
       }
 
-      saveAppState();
-      renderRouteManager();
-      renderStudentStartActiveRoute();
+      saveState();
+      renderRouteList();
+      renderSystemStatus();
 
-      const activeText = appState.activeRouteId === currentRouteId ? " och vald som aktiv bana" : "";
-      document.getElementById("saveStatus").innerHTML = "Banan <strong>" + escapeHtml(name) + "</strong> är sparad" + activeText + ".";
+      const activeText = state.activeRouteId === editingRouteId ? " och är aktiv för elever på denna enhet." : ".";
+      document.getElementById("saveStatus").innerHTML = "Banan <strong>" + escapeHtml(name) + "</strong> är sparad" + activeText;
     }
 
-    function loadRouteForEditing(routeId, showMessage) {
-      const route = getRouteById(routeId);
-
+    function loadRoute(id, showMessage) {
+      const route = getRoute(id);
       if (!route) return;
 
-      currentRouteId = route.id;
-      workingStations = deepClone(route.stations);
-      document.getElementById("routeNameInput").value = route.name;
+      editingRouteId = route.id;
+      workingQuestions = clone(route.questions);
+      document.getElementById("routeName").value = route.name;
+      document.getElementById("studentLinkBox").value = "";
 
-      clearForm();
-      renderStationList();
-      renderMarkers();
-      renderRouteInfo();
-      renderRouteLine();
+      clearQuestionForm();
+      renderQuestionList();
+      renderRouteStats();
+      renderTeacherMap();
 
       if (showMessage) {
-        document.getElementById("saveStatus").innerHTML = "Banan <strong>" + escapeHtml(route.name) + "</strong> är laddad för redigering.";
+        document.getElementById("saveStatus").innerHTML = "Banan <strong>" + escapeHtml(route.name) + "</strong> är laddad.";
       }
     }
 
-    function setActiveRoute(routeId) {
-      const route = getRouteById(routeId);
-
+    function setActiveRoute(id) {
+      const route = getRoute(id);
       if (!route) return;
 
-      appState.activeRouteId = routeId;
-      saveAppState();
-      renderRouteManager();
-      renderStudentStartActiveRoute();
+      state.activeRouteId = id;
+      saveState();
+      renderRouteList();
+      renderSystemStatus();
 
-      document.getElementById("saveStatus").innerHTML = "Banan <strong>" + escapeHtml(route.name) + "</strong> är nu aktiv för eleverna.";
+      document.getElementById("saveStatus").innerHTML = "Banan <strong>" + escapeHtml(route.name) + "</strong> är vald som aktiv.";
     }
 
-    function deleteRoute(routeId) {
-      const route = getRouteById(routeId);
+    function deleteRoute(id) {
+      const route = getRoute(id);
       if (!route) return;
+      if (!confirm("Radera banan: " + route.name + "?")) return;
 
-      const ok = confirm("Vill du radera banan: " + route.name + "?");
-      if (!ok) return;
+      state.routes = state.routes.filter(function(r) { return r.id !== id; });
 
-      appState.routes = appState.routes.filter(function(item) {
-        return item.id !== routeId;
-      });
-
-      if (appState.activeRouteId === routeId) {
-        appState.activeRouteId = appState.routes.length > 0 ? appState.routes[0].id : null;
+      if (state.activeRouteId === id) {
+        state.activeRouteId = state.routes.length ? state.routes[0].id : null;
       }
 
-      if (currentRouteId === routeId) {
-        currentRouteId = null;
-        workingStations = [];
-        document.getElementById("routeNameInput").value = "";
+      if (editingRouteId === id) {
+        editingRouteId = null;
+        workingQuestions = [];
+        document.getElementById("routeName").value = "";
       }
 
-      saveAppState();
-      renderRouteManager();
-      renderStationList();
-      renderMarkers();
-      renderRouteInfo();
-      renderRouteLine();
-
-      document.getElementById("saveStatus").innerHTML = "Banan är raderad.";
+      saveState();
+      renderRouteList();
+      renderQuestionList();
+      renderRouteStats();
+      renderTeacherMap();
+      document.getElementById("saveStatus").textContent = "Banan är raderad.";
     }
 
-    function renderRouteManager() {
-      const box = document.getElementById("routeManager");
+    function renderRouteList() {
+      const box = document.getElementById("routeList");
 
-      if (appState.routes.length === 0) {
+      if (state.routes.length === 0) {
         box.innerHTML = "<p>Inga banor sparade ännu.</p>";
         return;
       }
 
-      box.innerHTML = appState.routes.map(function(route) {
-        const isActive = route.id === appState.activeRouteId;
-        const isCurrent = route.id === currentRouteId;
-        const length = calculateRouteLengthForStations(route.stations);
-
+      box.innerHTML = state.routes.map(function(route) {
+        const isActive = route.id === state.activeRouteId;
+        const isEditing = route.id === editingRouteId;
         return `
-          <div class="route-manager-card">
-            <h3>
-              ${escapeHtml(route.name)}
-              ${isActive ? "<span class='active-badge'>Aktiv</span>" : ""}
-            </h3>
-            <p><strong>Frågor:</strong> ${route.stations.length}</p>
-            <p><strong>Ungefärlig längd:</strong> ${formatDistance(length)}</p>
-            <p><strong>Status:</strong> ${isCurrent ? "Öppen för redigering" : "Ej öppen"}</p>
-            <button class="small secondary" onclick="loadRouteForEditing('${route.id}', true)">Redigera/ladda</button>
+          <div class="card">
+            <h3>${escapeHtml(route.name)} ${isActive ? "<span class='active'>Aktiv</span>" : ""}</h3>
+            <p><strong>Frågor:</strong> ${route.questions.length}</p>
+            <p><strong>Längd:</strong> ${formatDistance(routeLength(route.questions))}</p>
+            <p><strong>Status:</strong> ${isEditing ? "Öppen för redigering" : "Ej öppen"}</p>
+            <button class="small secondary" onclick="loadRoute('${route.id}', true)">Ladda/redigera</button>
             <button class="small success" onclick="setActiveRoute('${route.id}')">Välj som aktiv</button>
             <button class="small danger" onclick="deleteRoute('${route.id}')">Radera</button>
           </div>
@@ -817,234 +608,444 @@
       }).join("");
     }
 
-    function startStudentRound() {
+    function makeStudentLink() {
+      const route = getActiveRoute();
+
+      if (!route) {
+        document.getElementById("studentLinkBox").value = "Ingen aktiv bana vald.";
+        return;
+      }
+
+      const data = encodeRoute(route);
+      const cleanUrl = location.origin + location.pathname;
+      const link = cleanUrl + "#bana=" + data;
+
+      document.getElementById("studentLinkBox").value = link;
+      document.getElementById("saveStatus").innerHTML = "Elevlänk skapad. Kopiera länken och skicka till eleverna.";
+    }
+
+    function initTeacherMap() {
+      if (typeof L === "undefined") {
+        document.getElementById("mapStatus").textContent = "Kartan kunde inte laddas.";
+        return;
+      }
+
+      if (teacherMap) {
+        teacherMap.invalidateSize();
+        return;
+      }
+
+      teacherMap = L.map("teacherMap").setView([55.6050, 13.0038], 15);
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: "&copy; OpenStreetMap"
+      }).addTo(teacherMap);
+
+      teacherMap.on("click", function(e) {
+        if (!mapClickActive) {
+          document.getElementById("mapStatus").textContent = "Tryck först på Markera punkt på kartan.";
+          return;
+        }
+
+        setQuestionPosition(e.latlng.lat, e.latlng.lng);
+        mapClickActive = false;
+      });
+    }
+
+    function activateMapClick() {
+      mapClickActive = true;
+      document.getElementById("mapStatus").textContent = "Klicka på kartan där frågan ska ligga.";
+    }
+
+    function useMapCenter() {
+      if (!teacherMap) return;
+      const c = teacherMap.getCenter();
+      setQuestionPosition(c.lat, c.lng);
+    }
+
+    function centerTeacherMapOnMe() {
+      if (!navigator.geolocation || !teacherMap) return;
+
+      navigator.geolocation.getCurrentPosition(function(pos) {
+        teacherMap.setView([pos.coords.latitude, pos.coords.longitude], 17);
+      }, function() {
+        alert("Kunde inte hitta din position.");
+      });
+    }
+
+    function setQuestionPosition(lat, lng) {
+      document.getElementById("qLat").value = lat.toFixed(6);
+      document.getElementById("qLng").value = lng.toFixed(6);
+
+      if (!document.getElementById("qTitle").value.trim()) {
+        document.getElementById("qTitle").value = "Fråga " + (workingQuestions.length + 1);
+      }
+
+      if (tempMarker && teacherMap) teacherMap.removeLayer(tempMarker);
+
+      tempMarker = L.marker([lat, lng], { draggable: true }).addTo(teacherMap);
+      tempMarker.bindPopup("Ny fråga. Dra markören för att flytta.").openPopup();
+
+      tempMarker.on("dragend", function(e) {
+        const p = e.target.getLatLng();
+        document.getElementById("qLat").value = p.lat.toFixed(6);
+        document.getElementById("qLng").value = p.lng.toFixed(6);
+      });
+
+      document.getElementById("mapStatus").textContent = "Punkt vald. Du kan dra markören om du vill flytta den.";
+    }
+
+    function selectedCorrect() {
+      const el = document.querySelector("input[name='correct']:checked");
+      return el ? Number(el.value) : 0;
+    }
+
+    function addQuestion() {
+      const title = document.getElementById("qTitle").value.trim();
+      const lat = Number(document.getElementById("qLat").value);
+      const lng = Number(document.getElementById("qLng").value);
+      const radius = Number(document.getElementById("qRadius").value) || 25;
+      const text = document.getElementById("qText").value.trim();
+      const a = document.getElementById("qA").value.trim();
+      const b = document.getElementById("qB").value.trim();
+      const c = document.getElementById("qC").value.trim();
+
+      if (!title || !text || !a || !b || !c || !lat || !lng) {
+        alert("Fyll i plats, fråga och tre svar.");
+        return;
+      }
+
+      workingQuestions.push({
+        id: "q_" + Date.now(),
+        title: title,
+        lat: lat,
+        lng: lng,
+        radius: radius,
+        text: text,
+        options: [a, b, c],
+        correct: selectedCorrect()
+      });
+
+      clearQuestionForm();
+      renderQuestionList();
+      renderRouteStats();
+      renderTeacherMap();
+
+      document.getElementById("saveStatus").innerHTML = "Frågan är tillagd. Kom ihåg att klicka <strong>Spara bana</strong>.";
+    }
+
+    function clearQuestionForm() {
+      ["qTitle","qLat","qLng","qText","qA","qB","qC"].forEach(function(id) {
+        document.getElementById(id).value = "";
+      });
+      document.getElementById("qRadius").value = "25";
+      const radio = document.querySelector("input[name='correct'][value='0']");
+      if (radio) radio.checked = true;
+      if (tempMarker && teacherMap) {
+        teacherMap.removeLayer(tempMarker);
+        tempMarker = null;
+      }
+      mapClickActive = false;
+    }
+
+    function renderQuestionList() {
+      const box = document.getElementById("questionList");
+
+      if (workingQuestions.length === 0) {
+        box.innerHTML = "<p>Inga frågor i aktuell bana.</p>";
+        return;
+      }
+
+      box.innerHTML = workingQuestions.map(function(q, i) {
+        return `
+          <div class="card">
+            <h3>${i + 1}. ${escapeHtml(q.title)}</h3>
+            <p><strong>Fråga:</strong> ${escapeHtml(q.text)}</p>
+            <p><strong>GPS:</strong> ${q.lat}, ${q.lng}</p>
+            <p><strong>Radie:</strong> ${q.radius} meter</p>
+            <p><strong>Svar 1:</strong> ${escapeHtml(q.options[0])}</p>
+            <p><strong>Svar 2:</strong> ${escapeHtml(q.options[1])}</p>
+            <p><strong>Svar 3:</strong> ${escapeHtml(q.options[2])}</p>
+            <p><strong>Rätt svar:</strong> ${q.correct + 1}. ${escapeHtml(q.options[q.correct])}</p>
+            <button class="small secondary" onclick="moveQuestion(${i}, -1)">Flytta upp</button>
+            <button class="small secondary" onclick="moveQuestion(${i}, 1)">Flytta ner</button>
+            <button class="small danger" onclick="deleteQuestion('${q.id}')">Ta bort</button>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function moveQuestion(index, dir) {
+      const next = index + dir;
+      if (next < 0 || next >= workingQuestions.length) return;
+
+      const tmp = workingQuestions[index];
+      workingQuestions[index] = workingQuestions[next];
+      workingQuestions[next] = tmp;
+
+      renderQuestionList();
+      renderRouteStats();
+      renderTeacherMap();
+      document.getElementById("saveStatus").innerHTML = "Ordningen är ändrad. Kom ihåg att spara banan.";
+    }
+
+    function deleteQuestion(id) {
+      workingQuestions = workingQuestions.filter(function(q) { return q.id !== id; });
+      renderQuestionList();
+      renderRouteStats();
+      renderTeacherMap();
+      document.getElementById("saveStatus").innerHTML = "Frågan är borttagen. Kom ihåg att spara banan.";
+    }
+
+    function renderRouteStats() {
+      const box = document.getElementById("routeStats");
+      const count = workingQuestions.length;
+      const length = routeLength(workingQuestions);
+
+      box.innerHTML = `
+        <strong>Frågor:</strong> ${count}<br>
+        <strong>Ungefärlig banlängd:</strong> ${formatDistance(length)}
+      `;
+    }
+
+    function renderTeacherMap() {
+      if (!teacherMap || typeof L === "undefined") return;
+
+      teacherMarkers.forEach(function(m) { teacherMap.removeLayer(m); });
+      teacherMarkers = [];
+
+      if (teacherRouteLine) {
+        teacherMap.removeLayer(teacherRouteLine);
+        teacherRouteLine = null;
+      }
+
+      workingQuestions.forEach(function(q, i) {
+        const marker = L.marker([q.lat, q.lng], { draggable: true }).addTo(teacherMap);
+        marker.bindPopup((i + 1) + ". " + escapeHtml(q.title));
+
+        marker.on("dragend", function(e) {
+          const p = e.target.getLatLng();
+          q.lat = Number(p.lat.toFixed(6));
+          q.lng = Number(p.lng.toFixed(6));
+          renderQuestionList();
+          renderRouteStats();
+          renderTeacherMap();
+          document.getElementById("saveStatus").innerHTML = "Punkt flyttad. Kom ihåg att spara banan.";
+        });
+
+        teacherMarkers.push(marker);
+      });
+
+      if (workingQuestions.length >= 2) {
+        teacherRouteLine = L.polyline(workingQuestions.map(function(q) {
+          return [q.lat, q.lng];
+        })).addTo(teacherMap);
+      }
+    }
+
+    function renderStudentRouteInfo() {
+      const box = document.getElementById("studentRouteInfo");
+      const route = getStudentRoute();
+
+      if (!route) {
+        box.innerHTML = "Ingen aktiv bana finns. Be läraren skapa en elevlänk eller välja aktiv bana.";
+        return;
+      }
+
+      box.innerHTML = `
+        <strong>Bana:</strong> ${escapeHtml(route.name)}<br>
+        <strong>Antal frågor:</strong> ${route.questions.length}
+      `;
+    }
+
+    function startRound() {
       const name = document.getElementById("studentName").value.trim();
       const klass = document.getElementById("studentClass").value.trim();
-      const activeRoute = getActiveRoute();
+      const route = getStudentRoute();
 
       if (!name || !klass) {
-        document.getElementById("studentStartMessage").innerHTML = "<div class='message warning'>Skriv både namn och klass innan du startar.</div>";
+        document.getElementById("studentStartStatus").innerHTML = "<div class='message warning'>Skriv både namn och klass.</div>";
         return;
       }
 
-      if (!activeRoute) {
-        document.getElementById("studentStartMessage").innerHTML = "<div class='message warning'>Det finns ingen aktiv bana. Be läraren välja en aktiv bana.</div>";
-        return;
-      }
-
-      if (activeRoute.stations.length === 0) {
-        document.getElementById("studentStartMessage").innerHTML = "<div class='message warning'>Den aktiva banan har inga frågor.</div>";
+      if (!route || route.questions.length === 0) {
+        document.getElementById("studentStartStatus").innerHTML = "<div class='message warning'>Ingen bana är redo.</div>";
         return;
       }
 
       answers = {};
       studentStarted = true;
-      showStudentRound();
-      startStudentGps();
+      showStudentView();
+      startGps();
     }
 
-    function renderStudentInfo() {
-      const name = document.getElementById("studentName").value.trim();
-      const klass = document.getElementById("studentClass").value.trim();
-      const activeRoute = getActiveRoute();
-
-      document.getElementById("studentInfoBox").innerHTML = `
-        <p><strong>Namn:</strong> ${escapeHtml(name)}</p>
-        <p><strong>Klass:</strong> ${escapeHtml(klass)}</p>
-        <p><strong>Bana:</strong> ${activeRoute ? escapeHtml(activeRoute.name) : "Ingen aktiv bana"}</p>
+    function renderStudentIdentity() {
+      const route = getStudentRoute();
+      document.getElementById("studentIdentity").innerHTML = `
+        <p><strong>Namn:</strong> ${escapeHtml(document.getElementById("studentName").value)}</p>
+        <p><strong>Klass:</strong> ${escapeHtml(document.getElementById("studentClass").value)}</p>
+        <p><strong>Bana:</strong> ${route ? escapeHtml(route.name) : ""}</p>
       `;
     }
 
-    function startStudentGps() {
+    function startGps() {
       if (!navigator.geolocation) {
-        document.getElementById("studentStatus").textContent = "Din webbläsare stödjer inte GPS.";
+        document.getElementById("studentStatus").textContent = "GPS stöds inte av denna webbläsare.";
         return;
       }
 
-      document.getElementById("studentStatus").textContent = "GPS startar. Godkänn platsbehörighet om webbläsaren frågar.";
+      document.getElementById("studentStatus").textContent = "Startar GPS. Godkänn platsbehörighet.";
 
-      studentWatchId = navigator.geolocation.watchPosition(
-        function(position) {
-          studentPosition = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-            accuracy: position.coords.accuracy
-          };
+      gpsWatchId = navigator.geolocation.watchPosition(function(pos) {
+        studentPosition = {
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+          accuracy: pos.coords.accuracy
+        };
 
-          updateStudentStatus();
-          renderStudentStations();
-          updateStudentMap();
-        },
-        function() {
-          document.getElementById("studentStatus").textContent = "GPS fungerar inte just nu. Kontrollera att platstjänster är aktiverade.";
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0
-        }
-      );
+        updateStudentStatus();
+        renderStudentQuestions();
+        renderStudentMap();
+      }, function() {
+        document.getElementById("studentStatus").textContent = "GPS fungerar inte just nu. Kontrollera platstjänster.";
+      }, {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      });
     }
 
-    function stopStudentGps() {
-      if (studentWatchId !== null && navigator.geolocation) {
-        navigator.geolocation.clearWatch(studentWatchId);
-        studentWatchId = null;
+    function stopGps() {
+      if (gpsWatchId !== null && navigator.geolocation) {
+        navigator.geolocation.clearWatch(gpsWatchId);
+        gpsWatchId = null;
       }
     }
 
-    function updateStudentStatus() {
-      if (!studentPosition) {
-        document.getElementById("studentStatus").textContent = "Söker GPS-position...";
-        return;
-      }
+    function nextQuestion() {
+      const route = getStudentRoute();
+      if (!route) return null;
 
-      const target = getNextTargetStation();
-
-      if (!target) {
-        document.getElementById("studentStatus").textContent = "Alla frågor är besvarade.";
-        document.getElementById("studentMapHelp").textContent = "Alla frågor är besvarade. Resultatet visas längst ner.";
-        return;
-      }
-
-      const distance = calculateDistance(
-        studentPosition.lat,
-        studentPosition.lng,
-        target.lat,
-        target.lng
-      );
-
-      const accuracyText = studentPosition.accuracy ? " GPS-noggrannhet: cirka " + Math.round(studentPosition.accuracy) + " m." : "";
-
-      if (distance <= target.radius) {
-        document.getElementById("studentStatus").textContent =
-          "Du är framme vid: " + target.title + ". Frågan är upplåst." + accuracyText;
-
-        document.getElementById("studentMapHelp").textContent =
-          "Du är framme vid nästa fråga. Svara på frågan nedanför kartan.";
-      } else {
-        document.getElementById("studentStatus").textContent =
-          "Nästa fråga: " + target.title + ", cirka " + formatDistance(distance) + " bort." + accuracyText;
-
-        document.getElementById("studentMapHelp").textContent =
-          "Gå mot markören på kartan. Linjen visar riktningen fågelvägen till nästa fråga.";
-      }
-    }
-
-    function getNextTargetStation() {
-      const activeStations = getActiveStations();
-
-      for (let i = 0; i < activeStations.length; i++) {
-        if (answers[activeStations[i].id] === undefined) {
-          return activeStations[i];
-        }
+      for (let i = 0; i < route.questions.length; i++) {
+        if (answers[route.questions[i].id] === undefined) return route.questions[i];
       }
 
       return null;
     }
 
-    function initStudentMap() {
-      const activeStations = getActiveStations();
+    function updateStudentStatus() {
+      const target = nextQuestion();
 
-      if (studentMap) {
-        setTimeout(function() {
-          studentMap.invalidateSize();
-          updateStudentMap();
-        }, 100);
+      if (!target) {
+        document.getElementById("studentStatus").textContent = "Alla frågor är besvarade.";
+        document.getElementById("studentMapHelp").textContent = "Tipsrundan är klar. Se resultatet längst ner.";
         return;
       }
 
-      let startLat = 55.6050;
-      let startLng = 13.0038;
-
-      if (activeStations.length > 0) {
-        startLat = activeStations[0].lat;
-        startLng = activeStations[0].lng;
+      if (!studentPosition) {
+        document.getElementById("studentStatus").textContent = "Söker GPS-position...";
+        return;
       }
 
-      studentMap = L.map("studentMap").setView([startLat, startLng], 17);
+      const d = distance(studentPosition.lat, studentPosition.lng, target.lat, target.lng);
+      const acc = studentPosition.accuracy ? " GPS-noggrannhet: cirka " + Math.round(studentPosition.accuracy) + " m." : "";
+
+      if (d <= target.radius) {
+        document.getElementById("studentStatus").textContent = "Du är framme vid: " + target.title + ". Frågan är upplåst." + acc;
+        document.getElementById("studentMapHelp").textContent = "Svara på frågan nedanför kartan.";
+      } else {
+        document.getElementById("studentStatus").textContent = "Nästa fråga: " + target.title + ". Avstånd: " + formatDistance(d) + "." + acc;
+        document.getElementById("studentMapHelp").textContent = "Gå mot nästa markör. Linjen visar riktningen fågelvägen.";
+      }
+    }
+
+    function initStudentMap() {
+      if (typeof L === "undefined") {
+        document.getElementById("studentMapHelp").textContent = "Kartan kunde inte laddas.";
+        return;
+      }
+
+      if (studentMap) {
+        studentMap.invalidateSize();
+        return;
+      }
+
+      const route = getStudentRoute();
+      const first = route && route.questions.length ? route.questions[0] : { lat: 55.6050, lng: 13.0038 };
+
+      studentMap = L.map("studentMap").setView([first.lat, first.lng], 17);
 
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 19,
         attribution: "&copy; OpenStreetMap"
       }).addTo(studentMap);
-
-      updateStudentMap();
     }
 
-    function updateStudentMap() {
-      if (!studentMap) return;
+    function renderStudentMap() {
+      if (!studentMap || typeof L === "undefined") return;
 
-      const activeStations = getActiveStations();
-      const target = getNextTargetStation();
+      const route = getStudentRoute();
+      if (!route) return;
 
-      studentQuestionMarkers.forEach(function(marker) {
-        studentMap.removeLayer(marker);
-      });
+      studentMarkers.forEach(function(m) { studentMap.removeLayer(m); });
+      studentMarkers = [];
 
-      studentQuestionMarkers = [];
+      if (studentUserMarker) {
+        studentMap.removeLayer(studentUserMarker);
+        studentUserMarker = null;
+      }
 
-      activeStations.forEach(function(station, index) {
-        const answered = answers[station.id] !== undefined;
-        const isTarget = target && station.id === target.id;
+      if (studentLine) {
+        studentMap.removeLayer(studentLine);
+        studentLine = null;
+      }
 
-        const marker = L.circleMarker([station.lat, station.lng], {
+      const target = nextQuestion();
+
+      route.questions.forEach(function(q, i) {
+        const answered = answers[q.id] !== undefined;
+        const isTarget = target && target.id === q.id;
+
+        const marker = L.circleMarker([q.lat, q.lng], {
           radius: isTarget ? 11 : 8,
           color: answered ? "#16a34a" : isTarget ? "#dc2626" : "#2563eb",
           fillColor: answered ? "#86efac" : isTarget ? "#fca5a5" : "#bfdbfe",
           fillOpacity: 0.9
-        })
-          .addTo(studentMap)
-          .bindPopup(
-            "<strong>" + (index + 1) + ". " + escapeHtml(station.title) + "</strong><br>" +
-            (answered ? "Besvarad" : isTarget ? "Nästa fråga" : "Kommande fråga")
-          );
+        }).addTo(studentMap);
 
-        studentQuestionMarkers.push(marker);
+        marker.bindPopup((i + 1) + ". " + escapeHtml(q.title));
+        studentMarkers.push(marker);
       });
 
       if (studentPosition) {
-        if (studentUserMarker) {
-          studentMap.removeLayer(studentUserMarker);
-        }
-
         studentUserMarker = L.circleMarker([studentPosition.lat, studentPosition.lng], {
           radius: 9,
           color: "#111827",
           fillColor: "#22c55e",
           fillOpacity: 1
-        })
-          .addTo(studentMap)
-          .bindPopup("Du är här");
+        }).addTo(studentMap);
 
-        if (studentRouteLine) {
-          studentMap.removeLayer(studentRouteLine);
-          studentRouteLine = null;
-        }
+        studentUserMarker.bindPopup("Du är här");
 
         if (target) {
-          studentRouteLine = L.polyline(
-            [
-              [studentPosition.lat, studentPosition.lng],
-              [target.lat, target.lng]
-            ],
-            {
-              color: "#111827",
-              weight: 4,
-              dashArray: "8, 8"
-            }
-          ).addTo(studentMap);
+          studentLine = L.polyline([
+            [studentPosition.lat, studentPosition.lng],
+            [target.lat, target.lng]
+          ], {
+            color: "#111827",
+            weight: 4,
+            dashArray: "8,8"
+          }).addTo(studentMap);
 
-          fitStudentMapToUserAndTarget(target);
-        } else {
-          studentMap.setView([studentPosition.lat, studentPosition.lng], 17);
+          fitStudentMap(target);
         }
       } else if (target) {
         studentMap.setView([target.lat, target.lng], 17);
       }
     }
 
-    function fitStudentMapToUserAndTarget(target) {
+    function fitStudentMap(target) {
       if (!studentMap || !studentPosition || !target) return;
 
       const bounds = L.latLngBounds(
@@ -1053,514 +1054,155 @@
       );
 
       studentMap.fitBounds(bounds, {
-        padding: [45, 45],
+        padding: [45,45],
         maxZoom: 18
       });
     }
 
     function centerStudentMap() {
-      const target = getNextTargetStation();
-
+      const target = nextQuestion();
       if (!studentMap) return;
 
       if (studentPosition && target) {
-        fitStudentMapToUserAndTarget(target);
-        return;
-      }
-
-      if (studentPosition) {
+        fitStudentMap(target);
+      } else if (studentPosition) {
         studentMap.setView([studentPosition.lat, studentPosition.lng], 17);
-        return;
-      }
-
-      if (target) {
+      } else if (target) {
         studentMap.setView([target.lat, target.lng], 17);
       }
     }
 
-    function initMap() {
-      if (map) {
-        setTimeout(function() {
-          map.invalidateSize();
-          renderMarkers();
-          renderRouteLine();
-        }, 100);
+    function renderStudentQuestions() {
+      const box = document.getElementById("studentQuestions");
+      const route = getStudentRoute();
+
+      if (!route) {
+        box.innerHTML = "<p>Ingen bana finns.</p>";
         return;
       }
 
-      map = L.map("map").setView([55.6050, 13.0038], 15);
-
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 19,
-        attribution: "&copy; OpenStreetMap"
-      }).addTo(map);
-
-      map.on("click", function(e) {
-        if (!placementActive) {
-          document.getElementById("mapStatus").textContent = "Tryck först på Markera punkt på kartan.";
-          return;
-        }
-
-        setQuestionPosition(e.latlng.lat, e.latlng.lng);
-        placementActive = false;
-        document.getElementById("mapStatus").textContent = "Punkt vald. Du kan dra markören om du vill flytta den.";
-      });
-
-      renderMarkers();
-      renderRouteLine();
-    }
-
-    function activatePlacement() {
-      placementActive = true;
-      document.getElementById("mapStatus").textContent = "Placering aktiv. Klicka på kartan där frågan ska ligga.";
-    }
-
-    function useMapCenter() {
-      if (!map) return;
-      const center = map.getCenter();
-      setQuestionPosition(center.lat, center.lng);
-      placementActive = false;
-      document.getElementById("mapStatus").textContent = "Kartans mittpunkt vald. Du kan dra markören om du vill flytta den.";
-    }
-
-    function centerMapOnMyPosition() {
-      if (!navigator.geolocation) {
-        alert("Din webbläsare stödjer inte GPS.");
-        return;
-      }
-
-      navigator.geolocation.getCurrentPosition(
-        function(position) {
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
-          map.setView([lat, lng], 17);
-          document.getElementById("mapStatus").textContent = "Kartan är centrerad på din position.";
-        },
-        function() {
-          alert("Kunde inte hitta din position. Testa att zooma manuellt på kartan.");
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0
-        }
-      );
-    }
-
-    function setQuestionPosition(lat, lng) {
-      document.getElementById("stationLat").value = lat.toFixed(6);
-      document.getElementById("stationLng").value = lng.toFixed(6);
-
-      if (!document.getElementById("stationTitle").value) {
-        document.getElementById("stationTitle").value = "Fråga " + (workingStations.length + 1);
-      }
-
-      if (tempMarker) {
-        map.removeLayer(tempMarker);
-      }
-
-      tempMarker = L.marker([lat, lng], { draggable: true })
-        .addTo(map)
-        .bindPopup("Ny fråga. Dra mig om du vill flytta punkten.")
-        .openPopup();
-
-      tempMarker.on("dragend", function(e) {
-        const pos = e.target.getLatLng();
-        document.getElementById("stationLat").value = pos.lat.toFixed(6);
-        document.getElementById("stationLng").value = pos.lng.toFixed(6);
-        document.getElementById("mapStatus").textContent = "Punkten flyttad. Nya koordinater är sparade i formuläret.";
-      });
-    }
-
-    function getSelectedCorrectAnswer() {
-      const selected = document.querySelector('input[name="correctAnswer"]:checked');
-      return selected ? parseInt(selected.value, 10) : 0;
-    }
-
-    function addQuestion() {
-      const title = document.getElementById("stationTitle").value.trim();
-      const lat = parseFloat(document.getElementById("stationLat").value);
-      const lng = parseFloat(document.getElementById("stationLng").value);
-      const radius = parseInt(document.getElementById("stationRadius").value, 10);
-      const question = document.getElementById("stationQuestion").value.trim();
-      const optionA = document.getElementById("optionA").value.trim();
-      const optionB = document.getElementById("optionB").value.trim();
-      const optionC = document.getElementById("optionC").value.trim();
-      const correct = getSelectedCorrectAnswer();
-
-      if (!title || isNaN(lat) || isNaN(lng) || !question || !optionA || !optionB || !optionC) {
-        alert("Fyll i punkt på kartan, fråga och tre svar.");
-        return;
-      }
-
-      workingStations.push({
-        id: Date.now(),
-        title,
-        lat,
-        lng,
-        radius: radius || 25,
-        question,
-        options: [optionA, optionB, optionC],
-        correct
-      });
-
-      if (tempMarker && map) {
-        map.removeLayer(tempMarker);
-        tempMarker = null;
-      }
-
-      clearForm();
-      renderStationList();
-      renderMarkers();
-      renderRouteInfo();
-      renderRouteLine();
-
-      document.getElementById("saveStatus").innerHTML = "Frågan är tillagd. Kom ihåg att klicka <strong>Spara bana</strong>.";
-    }
-
-    function clearForm() {
-      document.getElementById("stationTitle").value = "";
-      document.getElementById("stationLat").value = "";
-      document.getElementById("stationLng").value = "";
-      document.getElementById("stationRadius").value = "25";
-      document.getElementById("stationQuestion").value = "";
-      document.getElementById("optionA").value = "";
-      document.getElementById("optionB").value = "";
-      document.getElementById("optionC").value = "";
-
-      const firstRadio = document.querySelector('input[name="correctAnswer"][value="0"]');
-      if (firstRadio) firstRadio.checked = true;
-
-      if (tempMarker && map) {
-        map.removeLayer(tempMarker);
-        tempMarker = null;
-      }
-
-      document.getElementById("mapStatus").textContent = "Välj plats för frågan.";
-      placementActive = false;
-    }
-
-    function renderMarkers() {
-      if (!map) return;
-
-      markers.forEach(function(marker) {
-        map.removeLayer(marker);
-      });
-
-      markers = [];
-
-      workingStations.forEach(function(station, index) {
-        const marker = L.marker([station.lat, station.lng], { draggable: true })
-          .addTo(map)
-          .bindPopup(
-            "<strong>" + (index + 1) + ". " + escapeHtml(station.title) + "</strong><br>" +
-            escapeHtml(station.question) + "<br><br>" +
-            "Dra markören för att flytta frågans plats."
-          );
-
-        marker.on("dragend", function(e) {
-          const pos = e.target.getLatLng();
-          station.lat = Number(pos.lat.toFixed(6));
-          station.lng = Number(pos.lng.toFixed(6));
-          renderStationList();
-          renderRouteInfo();
-          renderRouteLine();
-          document.getElementById("saveStatus").innerHTML = "Punkt flyttad. Kom ihåg att klicka <strong>Spara bana</strong>.";
-        });
-
-        markers.push(marker);
-      });
-    }
-
-    function renderRouteLine() {
-      if (!map) return;
-
-      if (routeLine) {
-        map.removeLayer(routeLine);
-        routeLine = null;
-      }
-
-      if (workingStations.length < 2) return;
-
-      const points = workingStations.map(function(station) {
-        return [station.lat, station.lng];
-      });
-
-      routeLine = L.polyline(points).addTo(map);
-    }
-
-    function renderStationList() {
-      const box = document.getElementById("stationList");
-
-      if (workingStations.length === 0) {
-        box.innerHTML = "<p>Inga frågor tillagda ännu.</p>";
-        return;
-      }
-
-      box.innerHTML = workingStations.map(function(station, index) {
-        const correctText = station.options[station.correct] || "";
+      box.innerHTML = route.questions.map(function(q, i) {
+        const answered = answers[q.id] !== undefined;
+        const unlocked = isUnlocked(q);
 
         return `
-          <div class="station-card">
-            <h3>${index + 1}. ${escapeHtml(station.title)}</h3>
-            <p><strong>GPS:</strong> ${station.lat}, ${station.lng}</p>
-            <p><strong>Radie:</strong> ${station.radius} meter</p>
-            <p><strong>Fråga:</strong> ${escapeHtml(station.question)}</p>
-            <p><strong>Svar 1:</strong> ${escapeHtml(station.options[0])}</p>
-            <p><strong>Svar 2:</strong> ${escapeHtml(station.options[1])}</p>
-            <p><strong>Svar 3:</strong> ${escapeHtml(station.options[2])}</p>
-            <p><strong>Rätt svar:</strong> ${station.correct + 1}. ${escapeHtml(correctText)}</p>
-            <button class="small secondary" onclick="moveStationUp(${index})">Flytta upp</button>
-            <button class="small secondary" onclick="moveStationDown(${index})">Flytta ner</button>
-            <button class="small danger" onclick="deleteStation(${station.id})">Ta bort</button>
+          <div class="card">
+            <h3>${i + 1}. ${escapeHtml(q.title)}</h3>
+            <p><strong>Status:</strong> ${answered ? "Besvarad" : unlocked ? "Upplåst" : "Låst"}</p>
+            ${answered ? renderSavedAnswer(q) : unlocked ? renderQuestion(q) : renderLocked(q)}
           </div>
         `;
       }).join("");
     }
 
-    function moveStationUp(index) {
-      if (index <= 0) return;
-      const temp = workingStations[index - 1];
-      workingStations[index - 1] = workingStations[index];
-      workingStations[index] = temp;
-      renderStationList();
-      renderMarkers();
-      renderRouteInfo();
-      renderRouteLine();
-      document.getElementById("saveStatus").innerHTML = "Ordningen är ändrad. Kom ihåg att klicka <strong>Spara bana</strong>.";
-    }
-
-    function moveStationDown(index) {
-      if (index >= workingStations.length - 1) return;
-      const temp = workingStations[index + 1];
-      workingStations[index + 1] = workingStations[index];
-      workingStations[index] = temp;
-      renderStationList();
-      renderMarkers();
-      renderRouteInfo();
-      renderRouteLine();
-      document.getElementById("saveStatus").innerHTML = "Ordningen är ändrad. Kom ihåg att klicka <strong>Spara bana</strong>.";
-    }
-
-    function deleteStation(id) {
-      workingStations = workingStations.filter(function(station) {
-        return station.id !== id;
-      });
-
-      delete answers[id];
-      renderStationList();
-      renderMarkers();
-      renderRouteInfo();
-      renderRouteLine();
-      renderStudentStations();
-      renderResult();
-      document.getElementById("saveStatus").innerHTML = "Frågan är borttagen. Kom ihåg att klicka <strong>Spara bana</strong>.";
-    }
-
-    function renderRouteInfo() {
-      document.getElementById("questionCount").textContent = workingStations.length;
-
-      const totalDistance = calculateRouteLengthForStations(workingStations);
-      document.getElementById("routeLength").textContent = formatDistance(totalDistance);
-
-      const average = workingStations.length > 1 ? totalDistance / (workingStations.length - 1) : 0;
-      document.getElementById("averageDistance").textContent = formatDistance(average);
-
-      const details = document.getElementById("routeDetails");
-
-      if (workingStations.length < 2) {
-        details.innerHTML = "<p class='muted'>Lägg till minst två frågor för att se ungefärlig banlängd.</p>";
-        return;
-      }
-
-      let html = "<h3>Avstånd mellan frågorna</h3>";
-
-      for (let i = 0; i < workingStations.length - 1; i++) {
-        const a = workingStations[i];
-        const b = workingStations[i + 1];
-        const distance = calculateDistance(a.lat, a.lng, b.lat, b.lng);
-
-        html += `
-          <div class="route-row">
-            ${i + 1}. ${escapeHtml(a.title)} → ${i + 2}. ${escapeHtml(b.title)}:
-            <strong>${formatDistance(distance)}</strong>
-          </div>
-        `;
-      }
-
-      details.innerHTML = html;
-    }
-
-    function calculateRouteLengthForStations(stations) {
-      if (!stations || stations.length < 2) return 0;
-
-      let total = 0;
-
-      for (let i = 0; i < stations.length - 1; i++) {
-        total += calculateDistance(
-          stations[i].lat,
-          stations[i].lng,
-          stations[i + 1].lat,
-          stations[i + 1].lng
-        );
-      }
-
-      return total;
-    }
-
-    function renderStudentStations() {
-      const box = document.getElementById("studentStations");
-      const activeStations = getActiveStations();
-
-      if (!studentStarted) {
-        box.innerHTML = "<p>Starta tipsrundan först.</p>";
-        return;
-      }
-
-      if (activeStations.length === 0) {
-        box.innerHTML = "<p>Det finns inga frågor i den aktiva banan.</p>";
-        return;
-      }
-
-      box.innerHTML = activeStations.map(function(station, index) {
-        const answered = answers[station.id] !== undefined;
-        const unlocked = isStationUnlocked(station);
-
-        return `
-          <div class="station-card">
-            <h3>${index + 1}. ${escapeHtml(station.title)}</h3>
-            <p>Status: ${answered ? "Besvarad" : unlocked ? "Upplåst" : "Låst"}</p>
-            ${answered ? renderAnsweredWithoutCorrection(station) : unlocked ? renderQuestion(station) : renderLocked(station)}
-          </div>
-        `;
-      }).join("");
-    }
-
-    function renderLocked(station) {
-      let distanceText = "";
-
-      if (studentPosition) {
-        const distance = calculateDistance(
-          studentPosition.lat,
-          studentPosition.lng,
-          station.lat,
-          station.lng
-        );
-
-        distanceText = "<p>Du är cirka <strong>" + formatDistance(distance) + "</strong> från frågan.</p>";
-      }
-
-      return `
-        <div class="message locked">
-          <p>Gå till frågans plats för att låsa upp den.</p>
-          ${distanceText}
-        </div>
-      `;
-    }
-
-    function renderQuestion(station) {
-      return `
-        <p><strong>${escapeHtml(station.question)}</strong></p>
-        <button class="answer-btn" onclick="answerQuestion(${station.id}, 0)">1: ${escapeHtml(station.options[0])}</button>
-        <button class="answer-btn" onclick="answerQuestion(${station.id}, 1)">2: ${escapeHtml(station.options[1])}</button>
-        <button class="answer-btn" onclick="answerQuestion(${station.id}, 2)">3: ${escapeHtml(station.options[2])}</button>
-      `;
-    }
-
-    function renderAnsweredWithoutCorrection(station) {
-      const answer = answers[station.id];
-
-      return `
-        <div class="selected-answer">
-          Du har svarat alternativ ${answer + 1}. Rättning visas när alla frågor är klara.
-        </div>
-      `;
-    }
-
-    function isStationUnlocked(station) {
+    function isUnlocked(q) {
       if (!studentPosition) return false;
-
-      const distance = calculateDistance(
-        studentPosition.lat,
-        studentPosition.lng,
-        station.lat,
-        station.lng
-      );
-
-      return distance <= station.radius;
+      return distance(studentPosition.lat, studentPosition.lng, q.lat, q.lng) <= q.radius;
     }
 
-    function answerQuestion(id, selected) {
-      answers[id] = selected;
+    function renderLocked(q) {
+      let d = "";
+      if (studentPosition) {
+        d = "<p>Du är cirka <strong>" + formatDistance(distance(studentPosition.lat, studentPosition.lng, q.lat, q.lng)) + "</strong> från frågan.</p>";
+      }
+      return "<div class='message warning'>Gå till platsen för att låsa upp frågan." + d + "</div>";
+    }
+
+    function renderQuestion(q) {
+      return `
+        <p><strong>${escapeHtml(q.text)}</strong></p>
+        <button class="answer-btn" onclick="answerQuestion('${q.id}', 0)">1: ${escapeHtml(q.options[0])}</button>
+        <button class="answer-btn" onclick="answerQuestion('${q.id}', 1)">2: ${escapeHtml(q.options[1])}</button>
+        <button class="answer-btn" onclick="answerQuestion('${q.id}', 2)">3: ${escapeHtml(q.options[2])}</button>
+      `;
+    }
+
+    function renderSavedAnswer(q) {
+      return "<div class='answer-saved'>Du har svarat alternativ " + (answers[q.id] + 1) + ". Rättning visas när alla frågor är klara.</div>";
+    }
+
+    function answerQuestion(id, choice) {
+      answers[id] = choice;
       updateStudentStatus();
-      renderStudentStations();
+      renderStudentQuestions();
+      renderStudentMap();
       renderResult();
-      updateStudentMap();
     }
 
-    function allQuestionsAnswered() {
-      const activeStations = getActiveStations();
-
-      if (activeStations.length === 0) return false;
-
-      return activeStations.every(function(station) {
-        return answers[station.id] !== undefined;
+    function allAnswered() {
+      const route = getStudentRoute();
+      return route && route.questions.length > 0 && route.questions.every(function(q) {
+        return answers[q.id] !== undefined;
       });
     }
 
     function renderResult() {
       const box = document.getElementById("resultBox");
-      const activeStations = getActiveStations();
-      const total = activeStations.length;
-      const answeredCount = Object.keys(answers).length;
+      const route = getStudentRoute();
 
-      if (total === 0) {
-        box.innerHTML = "Inga frågor i aktiv bana.";
+      if (!route) {
+        box.innerHTML = "Ingen bana.";
         return;
       }
 
-      if (!allQuestionsAnswered()) {
+      const answeredCount = Object.keys(answers).length;
+
+      if (!allAnswered()) {
         box.innerHTML = `
-          <p><strong>Besvarade frågor:</strong> ${answeredCount} av ${total}</p>
-          <p>Resultatet och rätt svar visas när alla frågor är besvarade.</p>
+          <p><strong>Besvarade frågor:</strong> ${answeredCount} av ${route.questions.length}</p>
+          <p>Resultatet visas när alla frågor är besvarade.</p>
         `;
         return;
       }
 
-      let correctCount = 0;
-      let reviewHtml = "";
+      let correct = 0;
+      let review = "";
 
-      activeStations.forEach(function(station, index) {
-        const studentAnswer = answers[station.id];
-        const isCorrect = studentAnswer === station.correct;
+      route.questions.forEach(function(q, i) {
+        const a = answers[q.id];
+        const ok = a === q.correct;
+        if (ok) correct++;
 
-        if (isCorrect) correctCount++;
-
-        reviewHtml += `
-          <div class="station-card ${isCorrect ? "correct" : "wrong"}">
-            <h3>${index + 1}. ${escapeHtml(station.title)}</h3>
-            <p><strong>Fråga:</strong> ${escapeHtml(station.question)}</p>
-            <p><strong>Ditt svar:</strong> ${studentAnswer + 1}. ${escapeHtml(station.options[studentAnswer])}</p>
-            <p><strong>Rätt svar:</strong> ${station.correct + 1}. ${escapeHtml(station.options[station.correct])}</p>
-            <p><strong>Resultat:</strong> ${isCorrect ? "Rätt" : "Fel"}</p>
+        review += `
+          <div class="card ${ok ? "ok" : "bad"}">
+            <h3>${i + 1}. ${escapeHtml(q.title)}</h3>
+            <p><strong>Fråga:</strong> ${escapeHtml(q.text)}</p>
+            <p><strong>Ditt svar:</strong> ${a + 1}. ${escapeHtml(q.options[a])}</p>
+            <p><strong>Rätt svar:</strong> ${q.correct + 1}. ${escapeHtml(q.options[q.correct])}</p>
+            <p><strong>Resultat:</strong> ${ok ? "Rätt" : "Fel"}</p>
           </div>
         `;
       });
 
-      const percent = Math.round((correctCount / total) * 100);
+      const percent = Math.round((correct / route.questions.length) * 100);
 
       box.innerHTML = `
-        <div class="message correct">
+        <div class="message ok">
           <h3>Tipsrundan är klar!</h3>
-          <p><strong>Rätt svar:</strong> ${correctCount} av ${total}</p>
+          <p><strong>Rätt:</strong> ${correct} av ${route.questions.length}</p>
           <p><strong>Procent:</strong> ${percent}%</p>
         </div>
-        <h3>Rättning</h3>
-        ${reviewHtml}
+        ${review}
       `;
     }
 
-    function calculateDistance(lat1, lng1, lat2, lng2) {
+    function clearAllRoutes() {
+      if (!confirm("Vill du rensa alla sparade banor på denna dator?")) return;
+      state = { routes: [], activeRouteId: null };
+      editingRouteId = null;
+      workingQuestions = [];
+      saveState();
+      document.getElementById("routeName").value = "";
+      document.getElementById("studentLinkBox").value = "";
+      renderRouteList();
+      renderQuestionList();
+      renderRouteStats();
+      renderTeacherMap();
+      renderSystemStatus();
+      document.getElementById("saveStatus").textContent = "Alla banor är rensade.";
+    }
+
+    function distance(lat1, lng1, lat2, lng2) {
       const R = 6371000;
       const dLat = toRad(lat2 - lat1);
       const dLng = toRad(lng2 - lng1);
@@ -1568,62 +1210,30 @@
         Math.sin(dLat / 2) * Math.sin(dLat / 2) +
         Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
         Math.sin(dLng / 2) * Math.sin(dLng / 2);
-
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
       return R * c;
     }
 
-    function toRad(value) {
-      return value * Math.PI / 180;
-    }
-
-    function formatDistance(meters) {
-      if (!meters || meters < 1) return "0 m";
-      if (meters < 1000) return Math.round(meters) + " m";
-      return (meters / 1000).toFixed(2).replace(".", ",") + " km";
-    }
-
-    function resetEverything() {
-      if (!confirm("Vill du rensa alla sparade banor, frågor och svar?")) return;
-
-      appState = {
-        routes: [],
-        activeRouteId: null
-      };
-
-      currentRouteId = null;
-      workingStations = [];
-      answers = {};
-      studentPosition = null;
-      studentStarted = false;
-
-      localStorage.removeItem(STORAGE_KEY);
-
-      document.getElementById("routeNameInput").value = "";
-
-      if (tempMarker && map) {
-        map.removeLayer(tempMarker);
-        tempMarker = null;
+    function routeLength(questions) {
+      if (!questions || questions.length < 2) return 0;
+      let total = 0;
+      for (let i = 0; i < questions.length - 1; i++) {
+        total += distance(questions[i].lat, questions[i].lng, questions[i + 1].lat, questions[i + 1].lng);
       }
-
-      if (routeLine && map) {
-        map.removeLayer(routeLine);
-        routeLine = null;
-      }
-
-      renderRouteManager();
-      renderStationList();
-      renderMarkers();
-      renderRouteInfo();
-      renderRouteLine();
-      renderStudentStations();
-      renderResult();
-      clearForm();
-
-      document.getElementById("saveStatus").innerHTML = "Alla banor är rensade.";
+      return total;
     }
 
-    function deepClone(value) {
+    function toRad(v) {
+      return v * Math.PI / 180;
+    }
+
+    function formatDistance(m) {
+      if (!m || m < 1) return "0 m";
+      if (m < 1000) return Math.round(m) + " m";
+      return (m / 1000).toFixed(2).replace(".", ",") + " km";
+    }
+
+    function clone(value) {
       return JSON.parse(JSON.stringify(value));
     }
 
@@ -1636,8 +1246,40 @@
         .replaceAll("'", "&#039;");
     }
 
-    showStart();
+    function encodeRoute(route) {
+      const json = JSON.stringify(route);
+      const bytes = new TextEncoder().encode(json);
+      let binary = "";
+      bytes.forEach(function(b) { binary += String.fromCharCode(b); });
+      return btoa(binary).replaceAll("+", "-").replaceAll("/", "_").replaceAll("=", "");
+    }
+
+    function decodeRoute(data) {
+      try {
+        let base64 = data.replaceAll("-", "+").replaceAll("_", "/");
+        while (base64.length % 4) base64 += "=";
+        const binary = atob(base64);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+        const json = new TextDecoder().decode(bytes);
+        const route = JSON.parse(json);
+        if (route && route.name && Array.isArray(route.questions)) return route;
+      } catch (e) {}
+      return null;
+    }
+
+    function readRouteFromUrl() {
+      if (!location.hash || !location.hash.startsWith("#bana=")) return null;
+      const data = location.hash.replace("#bana=", "");
+      return decodeRoute(data);
+    }
+
+    window.addEventListener("load", function() {
+      renderSystemStatus();
+      renderStudentRouteInfo();
+      showStart();
+    });
   </script>
 </body>
 </html>
-<!-- slut SEKTION 1: KORT TESTVERSION DIGITAL TIPSRUNDA MED KARTA -->
+<!-- slut SEKTION 1: DIGITAL TIPSRUNDA REN VERSION -->
