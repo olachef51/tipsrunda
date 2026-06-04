@@ -76,6 +76,11 @@
       font-size: 16px;
     }
 
+    input[type="file"] {
+      background: #f9fafb;
+      border: 1px dashed #9ca3af;
+    }
+
     label {
       font-weight: bold;
     }
@@ -228,10 +233,18 @@
 
         <div id="saveStatus" class="statusbar">Ingen bana laddad.</div>
 
-        <h3>Elevlänk till aktiv bana</h3>
+        <h3>Dela bana till elever</h3>
         <p>Efter att du sparat en bana som aktiv kan du skapa en elevlänk. Den länken innehåller banan så eleverna kan öppna den på sina mobiler.</p>
         <button class="success" onclick="makeStudentLink()">Skapa elevlänk för aktiv bana</button>
         <textarea id="studentLinkBox" class="copybox" readonly placeholder="Här kommer elevlänken..."></textarea>
+
+        <h3>Exportera och importera banor</h3>
+        <p>Exportera alla sparade banor som en JSON-fil. En annan lärare kan sedan importera filen i sin webbläsare.</p>
+        <button class="success" onclick="exportRoutes()">Exportera alla banor</button>
+        <label>Importera banor från fil</label>
+        <input id="importFileInput" type="file" accept=".json,application/json" />
+        <button class="secondary" onclick="importRoutesFromFile()">Importera banor</button>
+        <div id="importExportStatus"></div>
 
         <h3>Sparade banor på denna dator</h3>
         <div id="routeList"></div>
@@ -348,8 +361,8 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <script>
-    const STORAGE_KEY = "digital_tipsrunda_clean_v1";
-    const TEACHER_PASSWORD = "1234";
+    const STORAGE_KEY = "digital_tipsrunda_clean_v2";
+    const TEACHER_PASSWORD = "password1234";
 
     let state = loadState();
     let editingRouteId = null;
@@ -606,6 +619,130 @@
           </div>
         `;
       }).join("");
+    }
+
+    function exportRoutes() {
+      const statusBox = document.getElementById("importExportStatus");
+
+      if (!state.routes || state.routes.length === 0) {
+        statusBox.innerHTML = "<div class='message warning'>Det finns inga banor att exportera.</div>";
+        return;
+      }
+
+      const exportData = {
+        app: "digital-tipsrunda",
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        activeRouteId: state.activeRouteId,
+        routes: state.routes
+      };
+
+      const json = JSON.stringify(exportData, null, 2);
+      const blob = new Blob([json], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const date = new Date().toISOString().slice(0, 10);
+      const filename = "tipsrundor-export-" + date + ".json";
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      statusBox.innerHTML = "<div class='message ok'>Export klar. Filen <strong>" + escapeHtml(filename) + "</strong> har skapats.</div>";
+    }
+
+    function importRoutesFromFile() {
+      const input = document.getElementById("importFileInput");
+      const statusBox = document.getElementById("importExportStatus");
+      const file = input.files && input.files[0];
+
+      if (!file) {
+        statusBox.innerHTML = "<div class='message warning'>Välj en JSON-fil först.</div>";
+        return;
+      }
+
+      const reader = new FileReader();
+
+      reader.onload = function(event) {
+        try {
+          const imported = JSON.parse(event.target.result);
+          let importedRoutes = [];
+
+          if (imported && Array.isArray(imported.routes)) {
+            importedRoutes = imported.routes;
+          } else if (Array.isArray(imported)) {
+            importedRoutes = imported;
+          } else {
+            throw new Error("Filen innehåller inga banor.");
+          }
+
+          const validRoutes = importedRoutes
+            .filter(isValidRoute)
+            .map(function(route) {
+              return {
+                id: "route_import_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8),
+                name: makeUniqueRouteName(route.name || "Importerad bana"),
+                questions: clone(route.questions)
+              };
+            });
+
+          if (validRoutes.length === 0) {
+            statusBox.innerHTML = "<div class='message bad'>Importen misslyckades. Inga giltiga banor hittades.</div>";
+            return;
+          }
+
+          state.routes = state.routes.concat(validRoutes);
+
+          if (!state.activeRouteId) {
+            state.activeRouteId = validRoutes[0].id;
+          }
+
+          saveState();
+          renderRouteList();
+          renderSystemStatus();
+
+          statusBox.innerHTML = "<div class='message ok'>Import klar. <strong>" + validRoutes.length + "</strong> bana/banor importerades.</div>";
+          input.value = "";
+        } catch (error) {
+          statusBox.innerHTML = "<div class='message bad'>Importen misslyckades: " + escapeHtml(error.message) + "</div>";
+        }
+      };
+
+      reader.onerror = function() {
+        statusBox.innerHTML = "<div class='message bad'>Filen kunde inte läsas.</div>";
+      };
+
+      reader.readAsText(file);
+    }
+
+    function isValidRoute(route) {
+      if (!route || typeof route.name !== "string" || !Array.isArray(route.questions)) return false;
+
+      return route.questions.every(function(q) {
+        return q &&
+          typeof q.title === "string" &&
+          typeof q.text === "string" &&
+          Array.isArray(q.options) &&
+          q.options.length === 3 &&
+          typeof q.lat === "number" &&
+          typeof q.lng === "number" &&
+          typeof q.correct === "number";
+      });
+    }
+
+    function makeUniqueRouteName(baseName) {
+      let name = baseName;
+      let counter = 2;
+
+      while (state.routes.some(function(route) { return route.name === name; })) {
+        name = baseName + " (" + counter + ")";
+        counter++;
+      }
+
+      return name;
     }
 
     function makeStudentLink() {
