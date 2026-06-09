@@ -1,4 +1,4 @@
-<!-- start SEKTION 1: DIGITAL TIPSRUNDA REN VERSION -->
+<!-- start SEKTION 1: DIGITAL TIPSRUNDA STABIL GITHUB-BANFIL -->
 <!DOCTYPE html>
 <html lang="sv">
 <head>
@@ -102,12 +102,13 @@
       <div id="saveStatus" class="statusbar">Ingen bana laddad.</div>
 
       <h3>Dela bana till elever med QR-kod</h3>
-      <p>Denna version använder en separat banfil. Det gör QR-länken kort och stabil.</p>
+      <p>Denna version använder en separat banfil på GitHub. Det gör QR-koden kort, ren och stabil.</p>
 
       <ol class="small-note">
         <li>Spara banan som aktiv.</li>
         <li>Klicka <strong>Exportera aktiv bana som elevfil</strong>.</li>
-        <li>Ladda upp filen, till exempel <strong>bana.json</strong>, i samma GitHub-repository som <strong>index.html</strong>.</li>
+        <li>Ladda upp filen, till exempel <strong>bana.json</strong>, i samma GitHub-repository och samma mapp som <strong>index.html</strong>.</li>
+        <li>Klicka <strong>Testa banfil på GitHub</strong> och kontrollera att filen hittas.</li>
         <li>Klicka <strong>Skapa elevlänk och QR-kod</strong>.</li>
       </ol>
 
@@ -116,6 +117,7 @@
 
       <button class="success" onclick="exportActiveRouteFile()">Exportera aktiv bana som elevfil</button>
       <button class="success" onclick="makeStudentLinkAndQr()">Skapa elevlänk och QR-kod</button>
+      <button class="secondary" onclick="testRouteFileOnGithub()">Testa banfil på GitHub</button>
       <button class="secondary" onclick="printQrCode()">Skriv ut QR-kod</button>
 
       <textarea id="studentLinkBox" class="copybox" readonly placeholder="Här kommer elevlänken..."></textarea>
@@ -1857,185 +1859,78 @@ function exportActiveRouteFile(){
     "Elevfilen <strong>" + escapeHtml(safeFileName) + "</strong> är exporterad. Ladda upp den i samma GitHub-repository som index.html.";
 }
 
-function getBaseAppUrl(){
-  return location.origin + location.pathname;
-}
-
-function bytesToBase64Url(bytes){
-  let binary = "";
-  const chunkSize = 0x8000;
-
-  for(let i=0;i<bytes.length;i+=chunkSize){
-    const chunk = bytes.slice(i,i+chunkSize);
-    binary += String.fromCharCode.apply(null,chunk);
-  }
-
-  return btoa(binary).replaceAll("+","-").replaceAll("/","_").replaceAll("=","");
-}
-
-function base64UrlToBytes(data){
-  let base64 = data.replaceAll("-","+").replaceAll("_","/");
-
-  while(base64.length % 4){
-    base64 += "=";
-  }
-
-  const binary = atob(base64);
-  const bytes = new Uint8Array(binary.length);
-
-  for(let i=0;i<binary.length;i++){
-    bytes[i] = binary.charCodeAt(i);
-  }
-
-  return bytes;
-}
-
-async function gzipText(text){
-  if("CompressionStream" in window){
-    const stream = new Blob([text],{type:"text/plain"}).stream().pipeThrough(new CompressionStream("gzip"));
-    const buffer = await new Response(stream).arrayBuffer();
-    return new Uint8Array(buffer);
-  }
-
-  return new TextEncoder().encode(text);
-}
-
-async function gunzipText(bytes){
-  if("DecompressionStream" in window){
-    try{
-      const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"));
-      return await new Response(stream).text();
-    }catch(e){}
-  }
-
-  return new TextDecoder().decode(bytes);
-}
-
-function compactRoute(route){
-  return {
-    i: route.id || "",
-    n: route.name || "",
-    e: route.teacherEmail || "",
-    q: (route.questions || []).map(function(q){
-      return {
-        i: q.id || "",
-        t: q.title || "",
-        x: q.text || "",
-        o: q.options || [],
-        c: q.correct,
-        la: q.lat,
-        ln: q.lng,
-        r: q.radius || 25
-      };
-    })
-  };
-}
-
-function expandRoute(data){
-  if(data && data.q && Array.isArray(data.q)){
-    return {
-      id: data.i || "shared_route",
-      name: data.n || "Elevbana",
-      teacherEmail: data.e || "",
-      questions: data.q.map(function(q,index){
-        return {
-          id: q.i || "q_" + index,
-          title: q.t || "Station " + (index + 1),
-          text: q.x || "",
-          options: q.o || [],
-          correct: q.c,
-          lat: q.la,
-          lng: q.ln,
-          radius: q.r || 25
-        };
-      })
-    };
-  }
-
-  return data;
-}
-
-async function encodeRouteCompressed(route){
-  const json = JSON.stringify(compactRoute(route));
-  const bytes = await gzipText(json);
-  return bytesToBase64Url(bytes);
-}
-
-async function decodeRouteCompressed(data){
-  try{
-    const bytes = base64UrlToBytes(data);
-    const json = await gunzipText(bytes);
-    const route = expandRoute(JSON.parse(json));
-
-    if(isValidRoute(route)){
-      return route;
-    }
-  }catch(e){}
-
-  return null;
-}
-
-function encodeRoutePlain(route){
-  const json = JSON.stringify(route);
-  const bytes = new TextEncoder().encode(json);
-  return bytesToBase64Url(bytes);
-}
-
-async function makeStudentLink(){
-  const route = routeForSharing();
-
-  if(!route){
-    document.getElementById("saveStatus").innerHTML = "Ingen aktiv bana vald.";
-    return "";
-  }
-
-  const cleanUrl = getBaseAppUrl();
-  let link = "";
-  let modeText = "";
-
-  if("CompressionStream" in window){
-    const encodedRoute = await encodeRouteCompressed(route);
-    link = cleanUrl + "#gz=" + encodedRoute;
-    modeText = "komprimerad inbyggd bana";
-  }else{
-    const encodedRoute = encodeRoutePlain(route);
-    link = cleanUrl + "#bana=" + encodedRoute;
-    modeText = "inbyggd bana utan komprimering";
-  }
+function makeStudentLink(){
+  const fileName = document.getElementById("routeFileName").value.trim() || "bana.json";
+  const cleanFileName = fileName.endsWith(".json") ? fileName : fileName + ".json";
+  const cleanUrl = location.origin + location.pathname;
+  const link = cleanUrl + "?route=" + encodeURIComponent(cleanFileName);
 
   document.getElementById("studentLinkBox").value = link;
   document.getElementById("saveStatus").innerHTML =
-    "Elevlänk skapad med <strong>" + modeText + "</strong>. Längd: " + link.length + " tecken.";
-
+    "Elevlänk skapad med kort QR-länk. Kontrollera att <strong>" + escapeHtml(cleanFileName) + "</strong> ligger bredvid <strong>index.html</strong> på GitHub.";
   return link;
 }
 
-async function makeStudentLinkAndQr(){
+async function testRouteFileOnGithub(){
+  const fileName = document.getElementById("routeFileName").value.trim() || "bana.json";
+  const cleanFileName = fileName.endsWith(".json") ? fileName : fileName + ".json";
+  const cleanUrl = location.origin + location.pathname;
+  const testUrl = cleanUrl.replace(/[^\/]*$/, "") + cleanFileName;
   const box = document.getElementById("qrCodeBox");
 
-  try{
-    const link = await makeStudentLink();
+  box.innerHTML = "<div class='message'>Testar banfilen på GitHub:<br><strong>" + escapeHtml(testUrl) + "</strong></div>";
 
-    if(!link){
-      box.innerHTML = "<div class='message bad'>Ingen elevlänk kunde skapas.</div>";
-      return;
+  try{
+    const response = await fetch(cleanFileName + "?t=" + Date.now());
+
+    if(!response.ok){
+      throw new Error("HTTP " + response.status + " - " + cleanFileName);
     }
 
+    const data = await response.json();
+    const route = data && data.route ? data.route : data;
+
+    if(!isValidRoute(route)){
+      throw new Error("Banfilen finns, men JSON-formatet stämmer inte.");
+    }
+
+    box.innerHTML =
+      "<div class='message ok'><strong>Banfilen hittades och fungerar.</strong><br>" +
+      "Bana: " + escapeHtml(route.name) + "<br>Frågor: " + route.questions.length + "</div>";
+    document.getElementById("saveStatus").innerHTML = "Banfilen <strong>" + escapeHtml(cleanFileName) + "</strong> fungerar på GitHub.";
+  }catch(error){
+    box.innerHTML =
+      "<div class='message bad'><strong>Banfilen kunde inte laddas.</strong><br>" +
+      escapeHtml(error.message || String(error)) +
+      "<br><br>Lösning: exportera aktiv bana som <strong>" + escapeHtml(cleanFileName) + "</strong> och ladda upp filen bredvid <strong>index.html</strong> på GitHub.</div>";
+    document.getElementById("saveStatus").innerHTML = "Banfilen saknas eller har fel format.";
+  }
+}
+
+function makeStudentLinkAndQr(){
+  const link = makeStudentLink();
+  const box = document.getElementById("qrCodeBox");
+
+  if(!link){
+    box.innerHTML = "<div class='message bad'>Ingen elevlänk kunde skapas.</div>";
+    return;
+  }
+
+  try{
     box.innerHTML =
       "<h3>QR-kod till aktiv bana</h3>" +
       "<div class='qr-wrap'>" +
         "<canvas id='qrCanvas' width='260' height='260' aria-label='QR-kod till tipsrundan'></canvas>" +
       "</div>" +
       "<p>Eleverna skannar QR-koden för att öppna tipsrundan.</p>" +
-      "<p><strong>QR-längd:</strong> " + link.length + " tecken</p>" +
-      "<p class='small-note'>QR-koden skapas lokalt i sidan och använder ingen extern QR-tjänst.</p>";
+      "<p><strong>QR-länk:</strong> " + escapeHtml(link) + "</p>" +
+      "<p class='small-note'>QR-koden innehåller bara den korta länken till banfilen. Själva banan hämtas från GitHub.</p>";
 
     drawQrToCanvas(link,"qrCanvas",260);
-    document.getElementById("saveStatus").innerHTML = "QR-kod skapad med inbyggd komprimerad bana.";
+    document.getElementById("saveStatus").innerHTML = "QR-kod skapad. Länken är kort eftersom banan ligger i separat JSON-fil på GitHub.";
   }catch(error){
     box.innerHTML =
-      "<div class='message bad'>QR-koden kunde inte skapas lokalt: " + escapeHtml(error.message || String(error)) +
-      "<br>Det betyder att banan fortfarande är för stor för en QR-kod. Minska antal/längd på frågor eller använd separat banfil.</div>";
+      "<div class='message bad'>QR-koden kunde inte skapas lokalt: " + escapeHtml(error.message || String(error)) + "<br>Använd elevlänken ovan istället.</div>";
   }
 }
 
@@ -2951,6 +2846,9 @@ async function loadSharedRouteFromUrl(){
     const response = await fetch(routeFile + cacheBust);
 
     if(!response.ok){
+      if(response.status === 404){
+        throw new Error("HTTP 404 - Banfilen hittades inte: " + routeFile + ". Ladda upp filen bredvid index.html på GitHub.");
+      }
       throw new Error("HTTP " + response.status + " - " + routeFile);
     }
 
@@ -2965,7 +2863,7 @@ async function loadSharedRouteFromUrl(){
     }
 
     if(!isValidRoute(route)){
-      throw new Error("Banfilen har fel format.");
+      throw new Error("Banfilen finns, men har fel JSON-format.");
     }
 
     sharedRoute = route;
@@ -2978,11 +2876,23 @@ async function loadSharedRouteFromUrl(){
 
 function decodeRoute(data){
   try{
-    const bytes = base64UrlToBytes(data);
+    let base64 = data.replaceAll("-","+").replaceAll("_","/");
+
+    while(base64.length % 4){
+      base64 += "=";
+    }
+
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+
+    for(let i=0;i<binary.length;i++){
+      bytes[i] = binary.charCodeAt(i);
+    }
+
     const json = new TextDecoder().decode(bytes);
     const route = JSON.parse(json);
 
-    if(isValidRoute(route)){
+    if(route && route.name && Array.isArray(route.questions)){
       return route;
     }
   }catch(e){}
@@ -2990,27 +2900,14 @@ function decodeRoute(data){
   return null;
 }
 
-async function readRouteFromUrl(){
-  if(location.hash && location.hash.startsWith("#gz=")){
-    return await decodeRouteCompressed(location.hash.replace("#gz=",""));
-  }
-
-  if(location.hash && location.hash.startsWith("#bana=")){
-    return decodeRoute(location.hash.replace("#bana=",""));
-  }
-
-  return null;
+function readRouteFromUrl(){
+  if(!location.hash || !location.hash.startsWith("#bana=")) return null;
+  return decodeRoute(location.hash.replace("#bana=",""));
 }
 
 window.addEventListener("load",async function(){
-  sharedRoute = await readRouteFromUrl();
-
-  if(!sharedRoute){
-    await loadSharedRouteFromUrl();
-  }else{
-    sharedRouteLoadError = "";
-  }
-
+  sharedRoute = null;
+  await loadSharedRouteFromUrl();
   renderSystemStatus();
   renderStudentRouteInfo();
   showStart();
@@ -3018,4 +2915,4 @@ window.addEventListener("load",async function(){
 </script>
 </body>
 </html>
-<!-- slut SEKTION 1: DIGITAL TIPSRUNDA REN VERSION -->
+<!-- slut SEKTION 1: DIGITAL TIPSRUNDA STABIL GITHUB-BANFIL -->
