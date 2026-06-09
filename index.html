@@ -102,21 +102,20 @@
       <div id="saveStatus" class="statusbar">Ingen bana laddad.</div>
 
       <h3>Dela bana till elever med QR-kod</h3>
-      <p>Denna version använder en separat banfil. Det gör QR-länken kort och stabil.</p>
+      <p>Denna version bäddar in den aktiva banan direkt i elevlänken. Då behövs ingen separat <strong>bana.json</strong> och eleverna får inte längre HTTP 404 för banfilen.</p>
 
       <ol class="small-note">
         <li>Spara banan som aktiv.</li>
-        <li>Klicka <strong>Exportera aktiv bana som elevfil</strong>.</li>
-        <li>Ladda upp filen, till exempel <strong>bana.json</strong>, i samma GitHub-repository som <strong>index.html</strong>.</li>
         <li>Klicka <strong>Skapa elevlänk och QR-kod</strong>.</li>
+        <li>Eleverna skannar QR-koden och får med sig hela banan direkt i länken.</li>
       </ol>
 
-      <label>Filnamn för aktiv banfil på GitHub</label>
+      <label>Filnamn för banfil på GitHub, endast om du vill använda separat elevfil</label>
       <input id="routeFileName" value="bana.json" placeholder="Exempel: bana.json">
 
-      <button class="success" onclick="exportActiveRouteFile()">Exportera aktiv bana som elevfil</button>
       <button class="success" onclick="makeStudentLinkAndQr()">Skapa elevlänk och QR-kod</button>
       <button class="secondary" onclick="printQrCode()">Skriv ut QR-kod</button>
+      <button class="secondary" onclick="exportActiveRouteFile()">Valfritt: exportera aktiv bana som elevfil</button>
 
       <textarea id="studentLinkBox" class="copybox" readonly placeholder="Här kommer elevlänken..."></textarea>
 
@@ -1858,13 +1857,24 @@ function exportActiveRouteFile(){
 }
 
 function makeStudentLink(){
-  const fileName = document.getElementById("routeFileName").value.trim() || "bana.json";
-  const cleanFileName = fileName.endsWith(".json") ? fileName : fileName + ".json";
+  const route = routeForSharing();
+
+  if(!route){
+    document.getElementById("saveStatus").innerHTML = "Ingen aktiv bana vald. Spara banan och gör den aktiv först.";
+    return "";
+  }
+
+  if(!isValidRoute(route)){
+    document.getElementById("saveStatus").innerHTML = "Den aktiva banan har fel format och kan inte delas.";
+    return "";
+  }
+
   const cleanUrl = location.origin + location.pathname;
-  const link = cleanUrl + "?route=" + encodeURIComponent(cleanFileName);
+  const encodedRoute = encodeRoute(route);
+  const link = cleanUrl + "#bana=" + encodedRoute;
 
   document.getElementById("studentLinkBox").value = link;
-  document.getElementById("saveStatus").innerHTML = "Elevlänk skapad. Kontrollera att <strong>" + escapeHtml(cleanFileName) + "</strong> är uppladdad på GitHub.";
+  document.getElementById("saveStatus").innerHTML = "Elevlänk skapad med banan inbäddad direkt i länken. Ingen bana.json behövs.";
   return link;
 }
 
@@ -1888,7 +1898,7 @@ function makeStudentLinkAndQr(){
       "<p class='small-note'>QR-koden skapas lokalt i sidan och använder ingen extern QR-tjänst.</p>";
 
     drawQrToCanvas(link,"qrCanvas",260);
-    document.getElementById("saveStatus").innerHTML = "QR-kod skapad lokalt. Länken är kort eftersom banan ligger i separat JSON-fil.";
+    document.getElementById("saveStatus").innerHTML = "QR-kod skapad lokalt. Banan är inbäddad direkt i länken, så ingen bana.json behövs.";
   }catch(error){
     box.innerHTML =
       "<div class='message bad'>QR-koden kunde inte skapas lokalt: " + escapeHtml(error.message || String(error)) + "<br>Använd elevlänken ovan istället.</div>";
@@ -2797,7 +2807,6 @@ async function loadSharedRouteFromUrl(){
   const routeFile = params.get("route");
 
   if(!routeFile){
-    sharedRoute = null;
     sharedRouteLoadError = "";
     return;
   }
@@ -2830,6 +2839,19 @@ async function loadSharedRouteFromUrl(){
     sharedRoute = null;
     sharedRouteLoadError = error.message || String(error);
   }
+}
+
+
+function encodeRoute(route){
+  const json = JSON.stringify(route);
+  const bytes = new TextEncoder().encode(json);
+  let binary = "";
+
+  for(let i=0;i<bytes.length;i++){
+    binary += String.fromCharCode(bytes[i]);
+  }
+
+  return btoa(binary).replaceAll("+","-").replaceAll("/","_").replaceAll("=","");
 }
 
 function decodeRoute(data){
