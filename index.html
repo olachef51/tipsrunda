@@ -2,10 +2,10 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Digital tipsrunda</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
     *{box-sizing:border-box}
     body{margin:0;font-family:Arial,sans-serif;background:#f4f6f8;color:#222}
@@ -40,7 +40,7 @@
     .copybox{width:100%;min-height:90px;font-size:13px}
     .result-actions{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
     .qr-wrap{background:white;display:inline-block;padding:12px;border-radius:12px;border:1px solid #ddd}
-    .qr-wrap img{display:block;width:260px;height:260px;max-width:100%}
+    .qr-wrap canvas{display:block;width:260px;height:260px;max-width:100%}
     .small-note{font-size:14px;color:#374151}
     @media(max-width:700px){
       .grid-2{grid-template-columns:1fr}
@@ -72,7 +72,7 @@
     <div class="panel">
       <h2>Lärarinloggning</h2>
       <label>Lösenord</label>
-      <input id="teacherPassword" type="password" placeholder="Skriv lösenord">
+      <input id="teacherPassword" type="password" placeholder="Skriv lösenord" />
       <button class="success" onclick="loginTeacher()">Logga in</button>
       <button class="secondary" onclick="showStart()">Tillbaka</button>
       <div id="loginStatus"></div>
@@ -89,10 +89,10 @@
       <h2>Banor</h2>
 
       <label>Namn på bana</label>
-      <input id="routeName" placeholder="Exempel: Hygienrunda kök">
+      <input id="routeName" placeholder="Exempel: Hygienrunda kök" />
 
       <label>Lärarens e-post för elevresultat</label>
-      <input id="teacherEmail" type="email" placeholder="namn@skola.se">
+      <input id="teacherEmail" type="email" placeholder="namn@skola.se" />
 
       <button class="success" onclick="saveTeacherEmail()">Spara e-post</button>
       <button class="success" onclick="saveRoute(true)">Spara bana och gör aktiv</button>
@@ -112,7 +112,7 @@
       </ol>
 
       <label>Filnamn för aktiv banfil på GitHub</label>
-      <input id="routeFileName" value="bana.json" placeholder="Exempel: bana.json">
+      <input id="routeFileName" value="bana.json" placeholder="Exempel: bana.json" />
 
       <button class="success" onclick="exportActiveRouteFile()">Exportera aktiv bana som elevfil</button>
       <button class="success" onclick="makeStudentLinkAndQr()">Skapa elevlänk och QR-kod</button>
@@ -128,7 +128,7 @@
       <button class="success" onclick="exportRoutes()">Exportera alla banor</button>
 
       <label>Importera banor från fil</label>
-      <input id="importFileInput" type="file" accept=".json,application/json">
+      <input id="importFileInput" type="file" accept=".json,application/json" />
       <button class="secondary" onclick="importRoutesFromFile()">Importera banor</button>
       <div id="importExportStatus"></div>
 
@@ -149,22 +149,22 @@
       <div class="grid-2">
         <div>
           <label>Frågans plats/station</label>
-          <input id="qTitle" placeholder="Exempel: Station 1 - Entrén">
+          <input id="qTitle" placeholder="Exempel: Station 1 - Entrén" />
         </div>
         <div>
           <label>Radie i meter</label>
-          <input id="qRadius" type="number" value="25">
+          <input id="qRadius" type="number" value="25" />
         </div>
       </div>
 
       <div class="grid-2">
         <div>
           <label>Latitud</label>
-          <input id="qLat" readonly>
+          <input id="qLat" readonly />
         </div>
         <div>
           <label>Longitud</label>
-          <input id="qLng" readonly>
+          <input id="qLng" readonly />
         </div>
       </div>
 
@@ -172,19 +172,19 @@
       <textarea id="qText" rows="3" placeholder="Skriv frågan här"></textarea>
 
       <label>Svar 1</label>
-      <input id="qA" placeholder="Svarsalternativ 1">
+      <input id="qA" placeholder="Svarsalternativ 1" />
 
       <label>Svar 2</label>
-      <input id="qB" placeholder="Svarsalternativ 2">
+      <input id="qB" placeholder="Svarsalternativ 2" />
 
       <label>Svar 3</label>
-      <input id="qC" placeholder="Svarsalternativ 3">
+      <input id="qC" placeholder="Svarsalternativ 3" />
 
       <label>Rätt svar</label>
       <div class="radio-row">
-        <label><input type="radio" name="correct" value="0" checked> Svar 1</label>
-        <label><input type="radio" name="correct" value="1"> Svar 2</label>
-        <label><input type="radio" name="correct" value="2"> Svar 3</label>
+        <label><input type="radio" name="correct" value="0" checked /> Svar 1</label>
+        <label><input type="radio" name="correct" value="1" /> Svar 2</label>
+        <label><input type="radio" name="correct" value="2" /> Svar 3</label>
       </div>
 
       <button class="success" onclick="addQuestion()">Lägg till fråga</button>
@@ -208,10 +208,10 @@
       <div id="studentRouteInfo" class="message"></div>
 
       <label>Namn</label>
-      <input id="studentName" placeholder="Skriv ditt namn">
+      <input id="studentName" placeholder="Skriv ditt namn" />
 
       <label>Klass</label>
-      <input id="studentClass" placeholder="Skriv din klass">
+      <input id="studentClass" placeholder="Skriv din klass" />
 
       <button class="success" onclick="startRound()">Starta tipsrundan</button>
       <div id="studentStartStatus"></div>
@@ -245,9 +245,10 @@
 </main>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/qrcode@1.5.4/build/qrcode.min.js"></script>
 
 <script>
-const STORAGE_KEY = "digital_tipsrunda_clean_v8";
+const STORAGE_KEY = "digital_tipsrunda_clean_v9";
 const TEACHER_PASSWORD = "password1234";
 
 let state = loadState();
@@ -345,6 +346,7 @@ function showStudentView(){
 function renderSystemStatus(){
   const box = document.getElementById("systemStatus");
   const leafletStatus = typeof L !== "undefined" ? "Karta laddad." : "Karta kunde inte laddas. Kontrollera internetanslutning.";
+  const qrStatus = typeof QRCode !== "undefined" ? "QR-motor laddad." : "QR-motor kunde inte laddas.";
   const route = getStudentRoute();
 
   let routeText = route ? escapeHtml(route.name) : "Ingen aktiv bana";
@@ -354,7 +356,7 @@ function renderSystemStatus(){
   }
 
   box.innerHTML =
-    "<strong>Status:</strong> " + leafletStatus +
+    "<strong>Status:</strong> " + leafletStatus + " " + qrStatus +
     "<br><strong>Elevbana:</strong> " + routeText;
 }
 
@@ -601,30 +603,51 @@ function makeStudentLinkAndQr(){
     return;
   }
 
-  const qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=260x260&format=png&data=" + encodeURIComponent(link);
+  if(typeof QRCode === "undefined"){
+    box.innerHTML =
+      "<div class='message bad'>" +
+      "<strong>QR-motorn kunde inte laddas.</strong><br>" +
+      "Kontrollera internetanslutning eller skolans filter. Elevlänken ovan fungerar ändå och kan kopieras." +
+      "</div>";
+    return;
+  }
 
   box.innerHTML =
     "<h3>QR-kod till aktiv bana</h3>" +
-    "<div class='qr-wrap'>" +
-      "<img id='qrImage' src='" + qrUrl + "' alt='QR-kod till tipsrundan' width='260' height='260' onerror=\"document.getElementById('qrCodeBox').innerHTML='<div class=&quot;message bad&quot;>QR-koden kunde inte laddas. QR-tjänsten kan vara blockerad. Använd elevlänken ovan istället.</div>';\">" +
-    "</div>" +
+    "<div class='qr-wrap'><canvas id='qrCanvas' width='260' height='260'></canvas></div>" +
     "<p>Eleverna skannar QR-koden för att öppna tipsrundan.</p>" +
-    "<p><strong>QR-länk:</strong> " + escapeHtml(link) + "</p>";
+    "<p><strong>Elevlänk:</strong> " + escapeHtml(link) + "</p>";
 
-  document.getElementById("saveStatus").innerHTML = "QR-kod skapad. Länken är kort eftersom banan ligger i separat JSON-fil.";
+  QRCode.toCanvas(document.getElementById("qrCanvas"), link, {
+    width: 260,
+    margin: 2,
+    errorCorrectionLevel: "M"
+  }, function(error){
+    if(error){
+      box.innerHTML =
+        "<div class='message bad'>QR-koden kunde inte skapas. Använd elevlänken ovan istället.<br>" +
+        escapeHtml(error.message || String(error)) +
+        "</div>";
+      return;
+    }
+
+    document.getElementById("saveStatus").innerHTML =
+      "QR-kod skapad. Den skapas i webbläsaren och använder inte api.qrserver.com.";
+  });
 }
 
 function printQrCode(){
-  const qrImage = document.getElementById("qrImage");
+  const canvas = document.getElementById("qrCanvas");
   const link = document.getElementById("studentLinkBox").value;
   const route = getActiveRoute();
   const title = route ? route.name : "Digital tipsrunda";
 
-  if(!qrImage){
+  if(!canvas){
     alert("Skapa QR-koden först.");
     return;
   }
 
+  const qrData = canvas.toDataURL("image/png");
   const win = window.open("","_blank");
 
   win.document.write(
@@ -643,7 +666,7 @@ function printQrCode(){
     "<body>" +
       "<h1>" + escapeHtml(title) + "</h1>" +
       "<p>Skanna QR-koden för att starta tipsrundan.</p>" +
-      "<div class='qr'><img src='" + qrImage.src + "' alt='QR-kod'></div>" +
+      "<div class='qr'><img src='" + qrData + "' alt='QR-kod'></div>" +
       "<p class='link'>" + escapeHtml(link) + "</p>" +
       "<script>window.print();<\/script>" +
     "</body>" +
