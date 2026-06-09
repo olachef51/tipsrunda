@@ -1,294 +1,292 @@
 {
-  "app": "digital-tipsrunda",
+  "app": "digital-tipsrunda-elevbana",
   "version": 1,
-  "exportedAt": "2026-06-09T05:49:34.404Z",
-  "activeRouteId": "route_1780572319199",
-  "routes": [
-    {
-      "id": "route_1780572319199",
-      "name": "Hotell & Restaurang",
-      "questions": [
-        {
-          "id": "q_1780572119705",
-          "title": "Fråga 1",
-          "lat": 55.603913,
-          "lng": 13.018194,
-          "radius": 25,
-          "text": "Vad är det första man gör när man kommer ut i köket?",
-          "options": [
-            "Letar efter mat",
-            "Diskar och städar",
-            "Tvättar händerna"
-          ],
-          "correct": 2
-        },
-        {
-          "id": "q_1780572188239",
-          "title": "Fråga 2",
-          "lat": 55.604243,
-          "lng": 13.017958,
-          "radius": 25,
-          "text": "Vilken är den farliga förvarings temperaturen för matvaror?",
-          "options": [
-            "0-12",
-            "8-35",
-            "5-55"
-          ],
-          "correct": 2
-        },
-        {
-          "id": "q_1780572312858",
-          "title": "Fråga 3",
-          "lat": 55.603107,
-          "lng": 13.014793,
-          "radius": 25,
-          "text": "Vad hette hotellchefen som kom ihåg vad alla gäster ville ha?",
-          "options": [
-            "Bill Clinton",
-            "Conrad Hilton",
-            "Cesar Ritz"
-          ],
-          "correct": 2
-        },
-        {
-          "id": "q_1780572896662",
-          "title": "Fråga 4",
-          "lat": 55.602076,
-          "lng": 13.0117,
-          "radius": 25,
-          "text": "Vad betyder incheckning?",
-          "options": [
-            "När gästen lämnar hotellet.",
-            "När gästen kommer och får sitt rum.",
-            "När gästen äter frukost."
-          ],
-          "correct": 1
-        },
-        {
-          "id": "q_1780573247614",
-          "title": "Fråga 5",
-          "lat": 55.600808,
-          "lng": 13.008417,
-          "radius": 25,
-          "text": "Vad kan en gäst fråga om i receptionen som du kan svara på?",
-          "options": [
-            "Vägbeskrivning, tider och bokning.",
-            "Hur man reparerar en ugn.",
-            "Vilket rum bor Pter Andersson i?"
-          ],
-          "correct": 0
-        },
-        {
-          "id": "q_1780573343271",
-          "title": "Fråga 6",
-          "lat": 55.599665,
-          "lng": 13.009676,
-          "radius": 25,
-          "text": "Vad betyder mise en place?",
-          "options": [
-            "Att förbereda allt innan arbetet börjar.",
-            "Att diska efter maten.",
-            "Att servera gäster vid bordet"
-          ],
-          "correct": 0
-        },
-        {
-          "id": "q_1780573480238",
-          "title": "Fråga 7",
-          "lat": 55.600207,
-          "lng": 13.012476,
-          "radius": 25,
-          "text": "Varför ska rå kyckling hållas skild från sallad?",
-          "options": [
-            "För att salladen annars blir varm.",
-            "För att undvika bakterier och smittspridning.",
-            "För att kycklingen blir torr"
-          ],
-          "correct": 1
-        },
-        {
-          "id": "q_1780639118917",
-          "title": "Fråga 8",
-          "lat": 55.601429,
-          "lng": 13.016049,
-          "radius": 25,
-          "text": "Var ska kniven oftast ligga vid dukning?",
-          "options": [
-            "Till vänster om tallriken",
-            "Till höger om tallriken.",
-            "Ovanpå glaset."
-          ],
-          "correct": 1
-        },
-        {
-          "id": "q_1780643837750",
-          "title": "Fråga 9",
-          "lat": 55.59938,
-          "lng": 13.018023,
-          "radius": 25,
-          "text": "Vad gör man om en gäst klagar?",
-          "options": [
-            "Förklarar snällt att att gästen har fel",
-            "Lämar detta till min kollega att lösa",
-            "Lyssnar lugnt och försöker hjälpa"
-          ],
-          "correct": 2
-        },
-        {
-          "id": "q_1780644097863",
-          "title": "Fråga 10",
-          "lat": 55.597144,
-          "lng": 13.018908,
-          "radius": 25,
-          "text": "Vad betyder ergonomi?",
-          "options": [
-            "Att arbeta på ett sätt som är bra för kroppen",
-            "Att arbeta så snabbt som möjligt för det är bra i köket",
-            "Att aldrig ta paus"
-          ],
-          "correct": 0
-        },
-        {
-          "id": "q_1780644248691",
-          "title": "Fråga 11",
-          "lat": 55.595291,
-          "lng": 13.013449,
-          "radius": 25,
-          "text": "Vad är en råvara?",
-          "options": [
-            "En färdig restaurangnota",
-            "En ingrediens man använder i matlagning",
-            "Ett annat ord för bong"
-          ],
-          "correct": 1
-        },
-        {
-          "id": "q_1780644683442",
-          "title": "Fråga 12",
-          "lat": 55.595049,
-          "lng": 13.013648,
-          "radius": 25,
-          "text": "Vad betyder “no-show” på hotell?",
-          "options": [
-            "Gäst som checkar ut för sent.",
-            "Gäst som bokat men inte dyker upp.",
-            "Gäst som vill byta rum"
-          ],
-          "correct": 1
-        },
-        {
-          "id": "q_1780644810480",
-          "title": "Fråga 13",
-          "lat": 55.594635,
-          "lng": 13.013527,
-          "radius": 25,
-          "text": "Vad är en viktig skillnad mellan vandrarhem och hotell?",
-          "options": [
-            "Hotell har aldrig frukost.",
-            "Vandrarhem får inte ta emot gäster.",
-            "Vandrarhem har ofta enklare standard och fler gemensamma ytor."
-          ],
-          "correct": 2
-        },
-        {
-          "id": "q_1780644882968",
-          "title": "Fråga 14",
-          "lat": 55.59405,
-          "lng": 13.013074,
-          "radius": 25,
-          "text": "Vad är kors-kontaminering?",
-          "options": [
-            "När maten kokar för länge.",
-            "När man blandar kryddor.",
-            "När bakterier eller allergener förs över mellan livsmedel."
-          ],
-          "correct": 2
-        },
-        {
-          "id": "q_1780644988376",
-          "title": "Fråga 15",
-          "lat": 55.592575,
-          "lng": 13.012905,
-          "radius": 25,
-          "text": "Vad är egenkontroll?",
-          "options": [
-            "Att gästerna kontrollerar den egna maten.",
-            "Att man bara städar när det syns smuts.",
-            "Att personalen kontrollerar hygien, temperaturer och rutiner."
-          ],
-          "correct": 2
-        },
-        {
-          "id": "q_1780645324245",
-          "title": "Fråga 16",
-          "lat": 55.592005,
-          "lng": 13.013785,
-          "radius": 25,
-          "text": "Vad händer oftast om man steker i för kall panna?",
-          "options": [
-            "Det kokar i vätska istället för att få stekyta.",
-            "Det blir alltid bränt.",
-            "Det blir rått direkt"
-          ],
-          "correct": 0
-        },
-        {
-          "id": "q_1780645588573",
-          "title": "Fråga 17",
-          "lat": 55.592653,
-          "lng": 13.014493,
-          "radius": 25,
-          "text": "Vad betyder att reducera en sås?",
-          "options": [
-            "Att späda såsen med vatten.",
-            "Att frysa såsen.",
-            "Att koka den så att vätska avdunstar och smaken koncentreras"
-          ],
-          "correct": 2
-        },
-        {
-          "id": "q_1780645764987",
-          "title": "Fråga 18",
-          "lat": 55.593896,
-          "lng": 13.01416,
-          "radius": 25,
-          "text": "Vad betyder spårbarhet i livsmedelshantering?",
-          "options": [
-            "Att man kan se var råvaran kommer ifrån.",
-            "Att maten har ett spår på tallriken.",
-            "Att maten alltid är ekologisk."
-          ],
-          "correct": 0
-        },
-        {
-          "id": "q_1780645875567",
-          "title": "Fråga 19",
-          "lat": 55.594933,
-          "lng": 13.013839,
-          "radius": 25,
-          "text": "Vad är ett tecken på god kvalitet vid servering?",
-          "options": [
-            "Rätt mat, rätt temperatur, trevligt bemötande och ren miljö.",
-            "Snabb servering utan kontroll.",
-            "Att gästen inte ställer frågor."
-          ],
-          "correct": 0
-        },
-        {
-          "id": "q_1780646116338",
-          "title": "Fråga 20",
-          "lat": 55.595294,
-          "lng": 13.013528,
-          "radius": 25,
-          "text": "Hur många gäster bodde det på hotellet under sommaren om hotellet hade 48 rum, varje rum kunde ha 2 gäster, och hotellet var bokat i 37 dagar?",
-          "options": [
-            "870",
-            "2742",
-            "3552"
-          ],
-          "correct": 2
-        }
-      ]
-    }
-  ]
+  "exportedAt": "2026-06-09T08:25:19.127Z",
+  "route": {
+    "id": "route_import_1780993500477_4vigr5",
+    "name": "Hotell & Restaurang (2)",
+    "teacherEmail": "ola.ekdahl@malmo.se",
+    "questions": [
+      {
+        "id": "q_1780572119705",
+        "title": "Fråga 1",
+        "lat": 55.603913,
+        "lng": 13.018194,
+        "radius": 25,
+        "text": "Vad är det första man gör när man kommer ut i köket?",
+        "options": [
+          "Letar efter mat",
+          "Diskar och städar",
+          "Tvättar händerna"
+        ],
+        "correct": 2
+      },
+      {
+        "id": "q_1780572188239",
+        "title": "Fråga 2",
+        "lat": 55.604243,
+        "lng": 13.017958,
+        "radius": 25,
+        "text": "Vilken är den farliga förvarings temperaturen för matvaror?",
+        "options": [
+          "0-12",
+          "8-35",
+          "5-55"
+        ],
+        "correct": 2
+      },
+      {
+        "id": "q_1780572312858",
+        "title": "Fråga 3",
+        "lat": 55.603107,
+        "lng": 13.014793,
+        "radius": 25,
+        "text": "Vad hette hotellchefen som kom ihåg vad alla gäster ville ha?",
+        "options": [
+          "Bill Clinton",
+          "Conrad Hilton",
+          "Cesar Ritz"
+        ],
+        "correct": 2
+      },
+      {
+        "id": "q_1780572896662",
+        "title": "Fråga 4",
+        "lat": 55.602076,
+        "lng": 13.0117,
+        "radius": 25,
+        "text": "Vad betyder incheckning?",
+        "options": [
+          "När gästen lämnar hotellet.",
+          "När gästen kommer och får sitt rum.",
+          "När gästen äter frukost."
+        ],
+        "correct": 1
+      },
+      {
+        "id": "q_1780573247614",
+        "title": "Fråga 5",
+        "lat": 55.600808,
+        "lng": 13.008417,
+        "radius": 25,
+        "text": "Vad kan en gäst fråga om i receptionen som du kan svara på?",
+        "options": [
+          "Vägbeskrivning, tider och bokning.",
+          "Hur man reparerar en ugn.",
+          "Vilket rum bor Pter Andersson i?"
+        ],
+        "correct": 0
+      },
+      {
+        "id": "q_1780573343271",
+        "title": "Fråga 6",
+        "lat": 55.599665,
+        "lng": 13.009676,
+        "radius": 25,
+        "text": "Vad betyder mise en place?",
+        "options": [
+          "Att förbereda allt innan arbetet börjar.",
+          "Att diska efter maten.",
+          "Att servera gäster vid bordet"
+        ],
+        "correct": 0
+      },
+      {
+        "id": "q_1780573480238",
+        "title": "Fråga 7",
+        "lat": 55.600207,
+        "lng": 13.012476,
+        "radius": 25,
+        "text": "Varför ska rå kyckling hållas skild från sallad?",
+        "options": [
+          "För att salladen annars blir varm.",
+          "För att undvika bakterier och smittspridning.",
+          "För att kycklingen blir torr"
+        ],
+        "correct": 1
+      },
+      {
+        "id": "q_1780639118917",
+        "title": "Fråga 8",
+        "lat": 55.601429,
+        "lng": 13.016049,
+        "radius": 25,
+        "text": "Var ska kniven oftast ligga vid dukning?",
+        "options": [
+          "Till vänster om tallriken",
+          "Till höger om tallriken.",
+          "Ovanpå glaset."
+        ],
+        "correct": 1
+      },
+      {
+        "id": "q_1780643837750",
+        "title": "Fråga 9",
+        "lat": 55.59938,
+        "lng": 13.018023,
+        "radius": 25,
+        "text": "Vad gör man om en gäst klagar?",
+        "options": [
+          "Förklarar snällt att att gästen har fel",
+          "Lämar detta till min kollega att lösa",
+          "Lyssnar lugnt och försöker hjälpa"
+        ],
+        "correct": 2
+      },
+      {
+        "id": "q_1780644097863",
+        "title": "Fråga 10",
+        "lat": 55.597144,
+        "lng": 13.018908,
+        "radius": 25,
+        "text": "Vad betyder ergonomi?",
+        "options": [
+          "Att arbeta på ett sätt som är bra för kroppen",
+          "Att arbeta så snabbt som möjligt för det är bra i köket",
+          "Att aldrig ta paus"
+        ],
+        "correct": 0
+      },
+      {
+        "id": "q_1780644248691",
+        "title": "Fråga 11",
+        "lat": 55.595291,
+        "lng": 13.013449,
+        "radius": 25,
+        "text": "Vad är en råvara?",
+        "options": [
+          "En färdig restaurangnota",
+          "En ingrediens man använder i matlagning",
+          "Ett annat ord för bong"
+        ],
+        "correct": 1
+      },
+      {
+        "id": "q_1780644683442",
+        "title": "Fråga 12",
+        "lat": 55.595049,
+        "lng": 13.013648,
+        "radius": 25,
+        "text": "Vad betyder “no-show” på hotell?",
+        "options": [
+          "Gäst som checkar ut för sent.",
+          "Gäst som bokat men inte dyker upp.",
+          "Gäst som vill byta rum"
+        ],
+        "correct": 1
+      },
+      {
+        "id": "q_1780644810480",
+        "title": "Fråga 13",
+        "lat": 55.594635,
+        "lng": 13.013527,
+        "radius": 25,
+        "text": "Vad är en viktig skillnad mellan vandrarhem och hotell?",
+        "options": [
+          "Hotell har aldrig frukost.",
+          "Vandrarhem får inte ta emot gäster.",
+          "Vandrarhem har ofta enklare standard och fler gemensamma ytor."
+        ],
+        "correct": 2
+      },
+      {
+        "id": "q_1780644882968",
+        "title": "Fråga 14",
+        "lat": 55.59405,
+        "lng": 13.013074,
+        "radius": 25,
+        "text": "Vad är kors-kontaminering?",
+        "options": [
+          "När maten kokar för länge.",
+          "När man blandar kryddor.",
+          "När bakterier eller allergener förs över mellan livsmedel."
+        ],
+        "correct": 2
+      },
+      {
+        "id": "q_1780644988376",
+        "title": "Fråga 15",
+        "lat": 55.592575,
+        "lng": 13.012905,
+        "radius": 25,
+        "text": "Vad är egenkontroll?",
+        "options": [
+          "Att gästerna kontrollerar den egna maten.",
+          "Att man bara städar när det syns smuts.",
+          "Att personalen kontrollerar hygien, temperaturer och rutiner."
+        ],
+        "correct": 2
+      },
+      {
+        "id": "q_1780645324245",
+        "title": "Fråga 16",
+        "lat": 55.592005,
+        "lng": 13.013785,
+        "radius": 25,
+        "text": "Vad händer oftast om man steker i för kall panna?",
+        "options": [
+          "Det kokar i vätska istället för att få stekyta.",
+          "Det blir alltid bränt.",
+          "Det blir rått direkt"
+        ],
+        "correct": 0
+      },
+      {
+        "id": "q_1780645588573",
+        "title": "Fråga 17",
+        "lat": 55.592653,
+        "lng": 13.014493,
+        "radius": 25,
+        "text": "Vad betyder att reducera en sås?",
+        "options": [
+          "Att späda såsen med vatten.",
+          "Att frysa såsen.",
+          "Att koka den så att vätska avdunstar och smaken koncentreras"
+        ],
+        "correct": 2
+      },
+      {
+        "id": "q_1780645764987",
+        "title": "Fråga 18",
+        "lat": 55.593896,
+        "lng": 13.01416,
+        "radius": 25,
+        "text": "Vad betyder spårbarhet i livsmedelshantering?",
+        "options": [
+          "Att man kan se var råvaran kommer ifrån.",
+          "Att maten har ett spår på tallriken.",
+          "Att maten alltid är ekologisk."
+        ],
+        "correct": 0
+      },
+      {
+        "id": "q_1780645875567",
+        "title": "Fråga 19",
+        "lat": 55.594933,
+        "lng": 13.013839,
+        "radius": 25,
+        "text": "Vad är ett tecken på god kvalitet vid servering?",
+        "options": [
+          "Rätt mat, rätt temperatur, trevligt bemötande och ren miljö.",
+          "Snabb servering utan kontroll.",
+          "Att gästen inte ställer frågor."
+        ],
+        "correct": 0
+      },
+      {
+        "id": "q_1780646116338",
+        "title": "Fråga 20",
+        "lat": 55.595294,
+        "lng": 13.013528,
+        "radius": 25,
+        "text": "Hur många gäster bodde det på hotellet under sommaren om hotellet hade 48 rum, varje rum kunde ha 2 gäster, och hotellet var bokat i 37 dagar?",
+        "options": [
+          "870",
+          "2742",
+          "3552"
+        ],
+        "correct": 2
+      }
+    ]
+  }
 }
