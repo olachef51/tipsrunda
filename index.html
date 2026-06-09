@@ -7,27 +7,236 @@
   <title>Digital tipsrunda</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
-    *{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f4f6f8;color:#222}header{background:#1f2937;color:white;padding:18px;text-align:center}header h1{margin:0 0 6px;font-size:28px}header p{margin:0;font-size:15px}main{max-width:1100px;margin:0 auto;padding:16px}.panel{background:white;border-radius:14px;padding:16px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.12)}.hidden{display:none}button{border:none;border-radius:10px;padding:12px 16px;font-size:16px;cursor:pointer;margin:4px;background:#2563eb;color:white}button.success{background:#16a34a}button.secondary{background:#6b7280}button.danger{background:#dc2626}button.small{padding:8px 10px;font-size:14px}input,textarea{width:100%;padding:10px;margin:6px 0 12px;border-radius:8px;border:1px solid #ccc;font-size:16px}input[type=file]{background:#f9fafb;border:1px dashed #9ca3af}label{font-weight:bold}#teacherMap,#studentMap{height:420px;border-radius:14px;border:2px solid #d1d5db;margin:12px 0 16px}.message{padding:12px;border-radius:10px;margin:10px 0;background:#e0f2fe}.warning{background:#fef3c7}.ok{background:#dcfce7}.bad{background:#fee2e2}.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.card{border:1px solid #ddd;border-radius:12px;padding:12px;margin-bottom:10px;background:#fafafa}.answer-btn{display:block;width:100%;background:#374151;text-align:left;margin:8px 0}.answer-saved{padding:10px;border-radius:10px;background:#dbeafe;border:1px solid #93c5fd;font-weight:bold}.radio-row{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0 14px}.radio-row label{border:1px solid #d1d5db;border-radius:10px;padding:10px 12px;background:#f9fafb;font-weight:normal;cursor:pointer}.radio-row input{width:auto;margin:0 6px 0 0}.statusbar{font-weight:bold;padding:12px;border-radius:10px;background:#eef2ff;margin-bottom:10px}.active{display:inline-block;background:#16a34a;color:white;padding:3px 8px;border-radius:999px;font-size:13px;margin-left:6px}.copybox{width:100%;min-height:90px;font-size:13px}.result-actions{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.qr-wrap{background:white;display:inline-block;padding:12px;border-radius:12px;border:1px solid #ddd}@media(max-width:700px){.grid-2{grid-template-columns:1fr}button{width:100%;margin:4px 0}#teacherMap,#studentMap{height:360px}.result-actions{display:block}}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Arial,sans-serif;background:#f4f6f8;color:#222}
+    header{background:#1f2937;color:white;padding:18px;text-align:center}
+    header h1{margin:0 0 6px;font-size:28px}
+    header p{margin:0;font-size:15px}
+    main{max-width:1100px;margin:0 auto;padding:16px}
+    .panel{background:white;border-radius:14px;padding:16px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+    .hidden{display:none}
+    button{border:none;border-radius:10px;padding:12px 16px;font-size:16px;cursor:pointer;margin:4px;background:#2563eb;color:white}
+    button.success{background:#16a34a}
+    button.secondary{background:#6b7280}
+    button.danger{background:#dc2626}
+    button.small{padding:8px 10px;font-size:14px}
+    input,textarea{width:100%;padding:10px;margin:6px 0 12px;border-radius:8px;border:1px solid #ccc;font-size:16px}
+    input[type=file]{background:#f9fafb;border:1px dashed #9ca3af}
+    label{font-weight:bold}
+    #teacherMap,#studentMap{height:420px;border-radius:14px;border:2px solid #d1d5db;margin:12px 0 16px}
+    .message{padding:12px;border-radius:10px;margin:10px 0;background:#e0f2fe}
+    .warning{background:#fef3c7}
+    .ok{background:#dcfce7}
+    .bad{background:#fee2e2}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .card{border:1px solid #ddd;border-radius:12px;padding:12px;margin-bottom:10px;background:#fafafa}
+    .answer-btn{display:block;width:100%;background:#374151;text-align:left;margin:8px 0}
+    .answer-saved{padding:10px;border-radius:10px;background:#dbeafe;border:1px solid #93c5fd;font-weight:bold}
+    .radio-row{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0 14px}
+    .radio-row label{border:1px solid #d1d5db;border-radius:10px;padding:10px 12px;background:#f9fafb;font-weight:normal;cursor:pointer}
+    .radio-row input{width:auto;margin:0 6px 0 0}
+    .statusbar{font-weight:bold;padding:12px;border-radius:10px;background:#eef2ff;margin-bottom:10px}
+    .active{display:inline-block;background:#16a34a;color:white;padding:3px 8px;border-radius:999px;font-size:13px;margin-left:6px}
+    .copybox{width:100%;min-height:90px;font-size:13px}
+    .result-actions{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+    .qr-wrap{background:white;display:inline-block;padding:12px;border-radius:12px;border:1px solid #ddd}
+    .qr-wrap img{display:block;max-width:260px;width:260px;height:260px}
+    @media(max-width:700px){
+      .grid-2{grid-template-columns:1fr}
+      button{width:100%;margin:4px 0}
+      #teacherMap,#studentMap{height:360px}
+      .result-actions{display:block}
+    }
   </style>
 </head>
+
 <body>
-<header><h1>Digital tipsrunda</h1><p>Geotaggad tipsrunda med karta, GPS och självrättning</p></header>
+<header>
+  <h1>Digital tipsrunda</h1>
+  <p>Geotaggad tipsrunda med karta, GPS och självrättning</p>
+</header>
+
 <main>
-  <section id="startView"><div class="panel"><h2>Start</h2><p>Välj elevläge eller lärarläge.</p><button class="success" onclick="showStudentStart()">Starta som elev</button><button class="secondary" onclick="showTeacherLogin()">Lärarläge</button><div id="systemStatus" class="message"></div></div></section>
-  <section id="teacherLoginView" class="hidden"><div class="panel"><h2>Lärarinloggning</h2><label>Lösenord</label><input id="teacherPassword" type="password" placeholder="Skriv lösenord"><button class="success" onclick="loginTeacher()">Logga in</button><button class="secondary" onclick="showStart()">Tillbaka</button><div id="loginStatus"></div></div></section>
-  <section id="teacherView" class="hidden">
-    <div class="panel"><button class="secondary" onclick="showStart()">Till startsidan</button><button class="danger" onclick="clearAllRoutes()">Rensa alla sparade banor</button></div>
-    <div class="panel"><h2>Banor</h2><label>Namn på bana</label><input id="routeName" placeholder="Exempel: Hygienrunda kök"><label>Lärarens e-post för elevresultat</label><input id="teacherEmail" type="email" placeholder="namn@skola.se"><button class="success" onclick="saveTeacherEmail()">Spara e-post</button><button class="success" onclick="saveRoute(true)">Spara bana och gör aktiv</button><button class="secondary" onclick="saveRoute(false)">Spara bana</button><button class="secondary" onclick="newRoute()">Ny tom bana</button><div id="saveStatus" class="statusbar">Ingen bana laddad.</div><h3>Dela bana till elever</h3><p>Elevlänken och QR-koden innehåller aktiv bana och lärarens e-post, så eleverna kan öppna rätt runda direkt och mejla resultat när rundan är klar.</p><button class="success" onclick="makeStudentLink()">Skapa elevlänk för aktiv bana</button><textarea id="studentLinkBox" class="copybox" readonly placeholder="Här kommer elevlänken..."></textarea><button class="success" onclick="makeStudentQrCode()">Skapa QR-kod för aktiv bana</button><button class="secondary" onclick="printQrCode()">Skriv ut QR-kod</button><div id="qrCodeBox" class="message"><p>Här visas QR-koden när du skapar den.</p></div><h3>Exportera och importera banor</h3><button class="success" onclick="exportRoutes()">Exportera alla banor</button><label>Importera banor från fil</label><input id="importFileInput" type="file" accept=".json,application/json"><button class="secondary" onclick="importRoutesFromFile()">Importera banor</button><div id="importExportStatus"></div><h3>Sparade banor på denna dator</h3><div id="routeList"></div></div>
-    <div class="panel"><h2>Skapa fråga</h2><div id="mapStatus" class="statusbar">Välj plats för frågan.</div><button class="success" onclick="activateMapClick()">Markera punkt på kartan</button><button class="secondary" onclick="useMapCenter()">Använd kartans mittpunkt</button><button class="secondary" onclick="centerTeacherMapOnMe()">Centrera på min position</button><div id="teacherMap"></div><div class="grid-2"><div><label>Frågans plats/station</label><input id="qTitle" placeholder="Exempel: Station 1 - Entrén"></div><div><label>Radie i meter</label><input id="qRadius" type="number" value="25"></div></div><div class="grid-2"><div><label>Latitud</label><input id="qLat" readonly></div><div><label>Longitud</label><input id="qLng" readonly></div></div><label>Fråga</label><textarea id="qText" rows="3" placeholder="Skriv frågan här"></textarea><label>Svar 1</label><input id="qA" placeholder="Svarsalternativ 1"><label>Svar 2</label><input id="qB" placeholder="Svarsalternativ 2"><label>Svar 3</label><input id="qC" placeholder="Svarsalternativ 3"><label>Rätt svar</label><div class="radio-row"><label><input type="radio" name="correct" value="0" checked> Svar 1</label><label><input type="radio" name="correct" value="1"> Svar 2</label><label><input type="radio" name="correct" value="2"> Svar 3</label></div><button class="success" onclick="addQuestion()">Lägg till fråga</button><button class="secondary" onclick="clearQuestionForm()">Töm frågeformulär</button></div>
-    <div class="panel"><h2>Aktuell bana</h2><div id="routeStats" class="message">Inga frågor tillagda.</div><div id="questionList"></div></div>
+  <section id="startView">
+    <div class="panel">
+      <h2>Start</h2>
+      <p>Välj elevläge eller lärarläge.</p>
+      <button class="success" onclick="showStudentStart()">Starta som elev</button>
+      <button class="secondary" onclick="showTeacherLogin()">Lärarläge</button>
+      <div id="systemStatus" class="message"></div>
+    </div>
   </section>
-  <section id="studentStartView" class="hidden"><div class="panel"><button class="secondary" onclick="showStart()">Till startsidan</button></div><div class="panel"><h2>Elevläge</h2><div id="studentRouteInfo" class="message"></div><label>Namn</label><input id="studentName" placeholder="Skriv ditt namn"><label>Klass</label><input id="studentClass" placeholder="Skriv din klass"><button class="success" onclick="startRound()">Starta tipsrundan</button><div id="studentStartStatus"></div></div></section>
-  <section id="studentView" class="hidden"><div class="panel"><h2>Tipsrundan</h2><div id="studentStatus" class="statusbar">Startar...</div><div id="studentIdentity"></div></div><div class="panel"><h2>Karta</h2><div id="studentMapHelp" class="message">Kartan visar din position och nästa fråga.</div><button class="secondary" onclick="centerStudentMap()">Centrera kartan</button><div id="studentMap"></div></div><div class="panel"><h2>Frågor</h2><div id="studentQuestions"></div></div><div class="panel"><h2>Resultat</h2><div id="resultBox">Resultatet visas när alla frågor är besvarade.</div></div></section>
+
+  <section id="teacherLoginView" class="hidden">
+    <div class="panel">
+      <h2>Lärarinloggning</h2>
+      <label>Lösenord</label>
+      <input id="teacherPassword" type="password" placeholder="Skriv lösenord">
+      <button class="success" onclick="loginTeacher()">Logga in</button>
+      <button class="secondary" onclick="showStart()">Tillbaka</button>
+      <div id="loginStatus"></div>
+    </div>
+  </section>
+
+  <section id="teacherView" class="hidden">
+    <div class="panel">
+      <button class="secondary" onclick="showStart()">Till startsidan</button>
+      <button class="danger" onclick="clearAllRoutes()">Rensa alla sparade banor</button>
+    </div>
+
+    <div class="panel">
+      <h2>Banor</h2>
+
+      <label>Namn på bana</label>
+      <input id="routeName" placeholder="Exempel: Hygienrunda kök">
+
+      <label>Lärarens e-post för elevresultat</label>
+      <input id="teacherEmail" type="email" placeholder="namn@skola.se">
+
+      <button class="success" onclick="saveTeacherEmail()">Spara e-post</button>
+      <button class="success" onclick="saveRoute(true)">Spara bana och gör aktiv</button>
+      <button class="secondary" onclick="saveRoute(false)">Spara bana</button>
+      <button class="secondary" onclick="newRoute()">Ny tom bana</button>
+
+      <div id="saveStatus" class="statusbar">Ingen bana laddad.</div>
+
+      <h3>Dela bana till elever</h3>
+      <p>Elevlänken och QR-koden innehåller aktiv bana och lärarens e-post, så eleverna kan öppna rätt runda direkt och mejla resultat när rundan är klar.</p>
+
+      <button class="success" onclick="makeStudentLink()">Skapa elevlänk för aktiv bana</button>
+      <textarea id="studentLinkBox" class="copybox" readonly placeholder="Här kommer elevlänken..."></textarea>
+
+      <button class="success" onclick="makeStudentQrCode()">Skapa QR-kod för aktiv bana</button>
+      <button class="secondary" onclick="printQrCode()">Skriv ut QR-kod</button>
+
+      <div id="qrCodeBox" class="message">
+        <p>Här visas QR-koden när du skapar den.</p>
+      </div>
+
+      <h3>Exportera och importera banor</h3>
+      <button class="success" onclick="exportRoutes()">Exportera alla banor</button>
+
+      <label>Importera banor från fil</label>
+      <input id="importFileInput" type="file" accept=".json,application/json">
+      <button class="secondary" onclick="importRoutesFromFile()">Importera banor</button>
+      <div id="importExportStatus"></div>
+
+      <h3>Sparade banor på denna dator</h3>
+      <div id="routeList"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Skapa fråga</h2>
+      <div id="mapStatus" class="statusbar">Välj plats för frågan.</div>
+
+      <button class="success" onclick="activateMapClick()">Markera punkt på kartan</button>
+      <button class="secondary" onclick="useMapCenter()">Använd kartans mittpunkt</button>
+      <button class="secondary" onclick="centerTeacherMapOnMe()">Centrera på min position</button>
+
+      <div id="teacherMap"></div>
+
+      <div class="grid-2">
+        <div>
+          <label>Frågans plats/station</label>
+          <input id="qTitle" placeholder="Exempel: Station 1 - Entrén">
+        </div>
+        <div>
+          <label>Radie i meter</label>
+          <input id="qRadius" type="number" value="25">
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <label>Latitud</label>
+          <input id="qLat" readonly>
+        </div>
+        <div>
+          <label>Longitud</label>
+          <input id="qLng" readonly>
+        </div>
+      </div>
+
+      <label>Fråga</label>
+      <textarea id="qText" rows="3" placeholder="Skriv frågan här"></textarea>
+
+      <label>Svar 1</label>
+      <input id="qA" placeholder="Svarsalternativ 1">
+
+      <label>Svar 2</label>
+      <input id="qB" placeholder="Svarsalternativ 2">
+
+      <label>Svar 3</label>
+      <input id="qC" placeholder="Svarsalternativ 3">
+
+      <label>Rätt svar</label>
+      <div class="radio-row">
+        <label><input type="radio" name="correct" value="0" checked> Svar 1</label>
+        <label><input type="radio" name="correct" value="1"> Svar 2</label>
+        <label><input type="radio" name="correct" value="2"> Svar 3</label>
+      </div>
+
+      <button class="success" onclick="addQuestion()">Lägg till fråga</button>
+      <button class="secondary" onclick="clearQuestionForm()">Töm frågeformulär</button>
+    </div>
+
+    <div class="panel">
+      <h2>Aktuell bana</h2>
+      <div id="routeStats" class="message">Inga frågor tillagda.</div>
+      <div id="questionList"></div>
+    </div>
+  </section>
+
+  <section id="studentStartView" class="hidden">
+    <div class="panel">
+      <button class="secondary" onclick="showStart()">Till startsidan</button>
+    </div>
+
+    <div class="panel">
+      <h2>Elevläge</h2>
+      <div id="studentRouteInfo" class="message"></div>
+
+      <label>Namn</label>
+      <input id="studentName" placeholder="Skriv ditt namn">
+
+      <label>Klass</label>
+      <input id="studentClass" placeholder="Skriv din klass">
+
+      <button class="success" onclick="startRound()">Starta tipsrundan</button>
+      <div id="studentStartStatus"></div>
+    </div>
+  </section>
+
+  <section id="studentView" class="hidden">
+    <div class="panel">
+      <h2>Tipsrundan</h2>
+      <div id="studentStatus" class="statusbar">Startar...</div>
+      <div id="studentIdentity"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Karta</h2>
+      <div id="studentMapHelp" class="message">Kartan visar din position och nästa fråga.</div>
+      <button class="secondary" onclick="centerStudentMap()">Centrera kartan</button>
+      <div id="studentMap"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Frågor</h2>
+      <div id="studentQuestions"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Resultat</h2>
+      <div id="resultBox">Resultatet visas när alla frågor är besvarade.</div>
+    </div>
+  </section>
 </main>
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
+
 <script>
-const STORAGE_KEY="digital_tipsrunda_clean_v4";
+const STORAGE_KEY="digital_tipsrunda_clean_v5";
 const TEACHER_PASSWORD="password1234";
 
 let state=loadState();
@@ -63,7 +272,9 @@ function saveState(){
 }
 
 function showOnly(id){
-  ["startView","teacherLoginView","teacherView","studentStartView","studentView"].forEach(v=>document.getElementById(v).classList.add("hidden"));
+  ["startView","teacherLoginView","teacherView","studentStartView","studentView"].forEach(function(v){
+    document.getElementById(v).classList.add("hidden");
+  });
   document.getElementById(id).classList.remove("hidden");
 }
 
@@ -88,7 +299,10 @@ function showTeacher(){
   renderRouteList();
   renderQuestionList();
   renderRouteStats();
-  setTimeout(()=>{initTeacherMap();renderTeacherMap();},100);
+  setTimeout(function(){
+    initTeacherMap();
+    renderTeacherMap();
+  },100);
 }
 
 function showStudentStart(){
@@ -102,14 +316,17 @@ function showStudentView(){
   renderStudentIdentity();
   renderStudentQuestions();
   renderResult();
-  setTimeout(()=>{initStudentMap();renderStudentMap();},100);
+  setTimeout(function(){
+    initStudentMap();
+    renderStudentMap();
+  },100);
 }
 
 function renderSystemStatus(){
   const box=document.getElementById("systemStatus");
   const leafletStatus=typeof L!=="undefined"?"Karta laddad.":"Karta kunde inte laddas. Kontrollera internetanslutning.";
   const route=getStudentRoute();
-  box.innerHTML=`<strong>Status:</strong> ${leafletStatus}<br><strong>Aktiv bana:</strong> ${route?escapeHtml(route.name):"Ingen aktiv bana"}`;
+  box.innerHTML="<strong>Status:</strong> "+leafletStatus+"<br><strong>Aktiv bana:</strong> "+(route?escapeHtml(route.name):"Ingen aktiv bana");
 }
 
 function loginTeacher(){
@@ -122,7 +339,9 @@ function loginTeacher(){
 }
 
 function getRoute(id){
-  return state.routes.find(route=>route.id===id);
+  return state.routes.find(function(route){
+    return route.id===id;
+  });
 }
 
 function getActiveRoute(){
@@ -238,7 +457,9 @@ function deleteRoute(id){
   if(!route)return;
   if(!confirm("Radera banan: "+route.name+"?"))return;
 
-  state.routes=state.routes.filter(r=>r.id!==id);
+  state.routes=state.routes.filter(function(r){
+    return r.id!==id;
+  });
 
   if(state.activeRouteId===id){
     state.activeRouteId=state.routes.length?state.routes[0].id:null;
@@ -266,18 +487,18 @@ function renderRouteList(){
     return;
   }
 
-  box.innerHTML=state.routes.map(route=>{
+  box.innerHTML=state.routes.map(function(route){
     const isActive=route.id===state.activeRouteId;
     const isEditing=route.id===editingRouteId;
-    return `<div class="card">
-      <h3>${escapeHtml(route.name)} ${isActive?"<span class='active'>Aktiv</span>":""}</h3>
-      <p><strong>Frågor:</strong> ${route.questions.length}</p>
-      <p><strong>Längd:</strong> ${formatDistance(routeLength(route.questions))}</p>
-      <p><strong>Status:</strong> ${isEditing?"Öppen för redigering":"Ej öppen"}</p>
-      <button class="small secondary" onclick="loadRoute('${route.id}', true)">Ladda/redigera</button>
-      <button class="small success" onclick="setActiveRoute('${route.id}')">Välj som aktiv</button>
-      <button class="small danger" onclick="deleteRoute('${route.id}')">Radera</button>
-    </div>`;
+    return "<div class='card'>"+
+      "<h3>"+escapeHtml(route.name)+" "+(isActive?"<span class='active'>Aktiv</span>":"")+"</h3>"+
+      "<p><strong>Frågor:</strong> "+route.questions.length+"</p>"+
+      "<p><strong>Längd:</strong> "+formatDistance(routeLength(route.questions))+"</p>"+
+      "<p><strong>Status:</strong> "+(isEditing?"Öppen för redigering":"Ej öppen")+"</p>"+
+      "<button class='small secondary' onclick=\"loadRoute('"+route.id+"', true)\">Ladda/redigera</button>"+
+      "<button class='small success' onclick=\"setActiveRoute('"+route.id+"')\">Välj som aktiv</button>"+
+      "<button class='small danger' onclick=\"deleteRoute('"+route.id+"')\">Radera</button>"+
+    "</div>";
   }).join("");
 }
 
@@ -313,74 +534,55 @@ function makeStudentQrCode(){
     return;
   }
 
-  box.innerHTML=`<h3>QR-kod till aktiv bana</h3>
-    <div class="qr-wrap"><canvas id="qrCanvas"></canvas></div>
-    <p>Eleverna skannar QR-koden för att öppna tipsrundan.</p>
-    <p><strong>Länklängd:</strong> ${link.length} tecken</p>`;
+  const qrUrl="https://api.qrserver.com/v1/create-qr-code/?size=260x260&format=png&data="+encodeURIComponent(link);
 
-  const canvas=document.getElementById("qrCanvas");
+  box.innerHTML=
+    "<h3>QR-kod till aktiv bana</h3>"+
+    "<div class='qr-wrap'>"+
+      "<img id='qrImage' src='"+qrUrl+"' alt='QR-kod till tipsrundan' width='260' height='260'>"+
+    "</div>"+
+    "<p>Eleverna skannar QR-koden för att öppna tipsrundan.</p>"+
+    "<p><strong>Länklängd:</strong> "+link.length+" tecken</p>";
 
-  if(typeof QRCode==="undefined"||!QRCode.toCanvas){
-    box.innerHTML=`<div class="message bad"><strong>QR-biblioteket kunde inte laddas.</strong><br>Kontrollera internetanslutning eller använd elevlänken direkt.</div><textarea class="copybox" readonly>${escapeHtml(link)}</textarea>`;
-    return;
-  }
-
-  QRCode.toCanvas(canvas,link,{
-    width:260,
-    margin:2,
-    errorCorrectionLevel:"L"
-  },function(error){
-    if(error){
-      console.error("QR-fel:",error);
-      box.innerHTML=`<div class="message bad">
-        <strong>QR-koden kunde inte skapas.</strong><br>
-        Elevlänken är troligen för lång för en QR-kod.
-        Testa med färre frågor, kortare frågetexter eller använd elevlänken direkt.
-      </div>
-      <textarea class="copybox" readonly>${escapeHtml(link)}</textarea>`;
-      return;
-    }
-
-    document.getElementById("saveStatus").innerHTML="QR-kod skapad för aktiv bana.";
-  });
+  document.getElementById("saveStatus").innerHTML="QR-kod skapad för aktiv bana.";
 }
 
 function printQrCode(){
-  const canvas=document.getElementById("qrCanvas");
+  const qrImage=document.getElementById("qrImage");
   const link=document.getElementById("studentLinkBox").value;
   const route=getActiveRoute();
   const title=route?route.name:"Digital tipsrunda";
 
-  if(!canvas){
+  if(!qrImage){
     alert("Skapa QR-koden först.");
     return;
   }
 
-  const qrImage=canvas.toDataURL("image/png");
-
   const win=window.open("","_blank");
-  win.document.write(`
-    <!DOCTYPE html>
-    <html lang="sv">
-    <head>
-      <meta charset="UTF-8">
-      <title>QR-kod tipsrunda</title>
-      <style>
-        body{font-family:Arial,sans-serif;text-align:center;padding:30px;}
-        .qr{display:inline-block;padding:20px;border:1px solid #ccc;border-radius:16px;}
-        img{width:300px;height:300px;}
-        .link{word-break:break-all;font-size:12px;margin-top:20px;}
-      </style>
-    </head>
-    <body>
-      <h1>${escapeHtml(title)}</h1>
-      <p>Skanna QR-koden för att starta tipsrundan.</p>
-      <div class="qr"><img src="${qrImage}" alt="QR-kod"></div>
-      <p class="link">${escapeHtml(link)}</p>
-      <script>window.print();<\/script>
-    </body>
-    </html>
-  `);
+
+  win.document.write(
+    "<!DOCTYPE html>"+
+    "<html lang='sv'>"+
+    "<head>"+
+      "<meta charset='UTF-8'>"+
+      "<title>QR-kod tipsrunda</title>"+
+      "<style>"+
+        "body{font-family:Arial,sans-serif;text-align:center;padding:30px;}"+
+        ".qr{display:inline-block;padding:20px;border:1px solid #ccc;border-radius:16px;}"+
+        "img{width:300px;height:300px;}"+
+        ".link{word-break:break-all;font-size:12px;margin-top:20px;}"+
+      "</style>"+
+    "</head>"+
+    "<body>"+
+      "<h1>"+escapeHtml(title)+"</h1>"+
+      "<p>Skanna QR-koden för att starta tipsrundan.</p>"+
+      "<div class='qr'><img src='"+qrImage.src+"' alt='QR-kod'></div>"+
+      "<p class='link'>"+escapeHtml(link)+"</p>"+
+      "<script>window.print();<\/script>"+
+    "</body>"+
+    "</html>"
+  );
+
   win.document.close();
 }
 
@@ -444,7 +646,7 @@ function importRoutesFromFile(){
         throw new Error("Filen innehåller inga banor.");
       }
 
-      const validRoutes=importedRoutes.filter(isValidRoute).map(route=>{
+      const validRoutes=importedRoutes.filter(isValidRoute).map(function(route){
         return{
           id:"route_import_"+Date.now()+"_"+Math.random().toString(36).slice(2,8),
           name:makeUniqueRouteName(route.name||"Importerad bana"),
@@ -485,7 +687,7 @@ function importRoutesFromFile(){
 function isValidRoute(route){
   if(!route||typeof route.name!=="string"||!Array.isArray(route.questions))return false;
 
-  return route.questions.every(q=>{
+  return route.questions.every(function(q){
     return q &&
       typeof q.title==="string" &&
       typeof q.text==="string" &&
@@ -501,7 +703,7 @@ function makeUniqueRouteName(baseName){
   let name=baseName;
   let counter=2;
 
-  while(state.routes.some(route=>route.name===name)){
+  while(state.routes.some(function(route){return route.name===name;})){
     name=baseName+" ("+counter+")";
     counter++;
   }
@@ -621,7 +823,7 @@ function addQuestion(){
 }
 
 function clearQuestionForm(){
-  ["qTitle","qLat","qLng","qText","qA","qB","qC"].forEach(id=>{
+  ["qTitle","qLat","qLng","qText","qA","qB","qC"].forEach(function(id){
     document.getElementById(id).value="";
   });
   document.getElementById("qRadius").value="25";
@@ -642,20 +844,20 @@ function renderQuestionList(){
     return;
   }
 
-  box.innerHTML=workingQuestions.map((q,i)=>{
-    return `<div class="card">
-      <h3>${i+1}. ${escapeHtml(q.title)}</h3>
-      <p><strong>Fråga:</strong> ${escapeHtml(q.text)}</p>
-      <p><strong>GPS:</strong> ${q.lat}, ${q.lng}</p>
-      <p><strong>Radie:</strong> ${q.radius} meter</p>
-      <p><strong>Svar 1:</strong> ${escapeHtml(q.options[0])}</p>
-      <p><strong>Svar 2:</strong> ${escapeHtml(q.options[1])}</p>
-      <p><strong>Svar 3:</strong> ${escapeHtml(q.options[2])}</p>
-      <p><strong>Rätt svar:</strong> ${q.correct+1}. ${escapeHtml(q.options[q.correct])}</p>
-      <button class="small secondary" onclick="moveQuestion(${i}, -1)">Flytta upp</button>
-      <button class="small secondary" onclick="moveQuestion(${i}, 1)">Flytta ner</button>
-      <button class="small danger" onclick="deleteQuestion('${q.id}')">Ta bort</button>
-    </div>`;
+  box.innerHTML=workingQuestions.map(function(q,i){
+    return "<div class='card'>"+
+      "<h3>"+(i+1)+". "+escapeHtml(q.title)+"</h3>"+
+      "<p><strong>Fråga:</strong> "+escapeHtml(q.text)+"</p>"+
+      "<p><strong>GPS:</strong> "+q.lat+", "+q.lng+"</p>"+
+      "<p><strong>Radie:</strong> "+q.radius+" meter</p>"+
+      "<p><strong>Svar 1:</strong> "+escapeHtml(q.options[0])+"</p>"+
+      "<p><strong>Svar 2:</strong> "+escapeHtml(q.options[1])+"</p>"+
+      "<p><strong>Svar 3:</strong> "+escapeHtml(q.options[2])+"</p>"+
+      "<p><strong>Rätt svar:</strong> "+(q.correct+1)+". "+escapeHtml(q.options[q.correct])+"</p>"+
+      "<button class='small secondary' onclick='moveQuestion("+i+", -1)'>Flytta upp</button>"+
+      "<button class='small secondary' onclick='moveQuestion("+i+", 1)'>Flytta ner</button>"+
+      "<button class='small danger' onclick=\"deleteQuestion('"+q.id+"')\">Ta bort</button>"+
+    "</div>";
   }).join("");
 }
 
@@ -674,7 +876,9 @@ function moveQuestion(index,dir){
 }
 
 function deleteQuestion(id){
-  workingQuestions=workingQuestions.filter(q=>q.id!==id);
+  workingQuestions=workingQuestions.filter(function(q){
+    return q.id!==id;
+  });
   renderQuestionList();
   renderRouteStats();
   renderTeacherMap();
@@ -686,13 +890,15 @@ function renderRouteStats(){
   const count=workingQuestions.length;
   const length=routeLength(workingQuestions);
 
-  box.innerHTML=`<strong>Frågor:</strong> ${count}<br><strong>Ungefärlig banlängd:</strong> ${formatDistance(length)}`;
+  box.innerHTML="<strong>Frågor:</strong> "+count+"<br><strong>Ungefärlig banlängd:</strong> "+formatDistance(length);
 }
 
 function renderTeacherMap(){
   if(!teacherMap||typeof L==="undefined")return;
 
-  teacherMarkers.forEach(m=>teacherMap.removeLayer(m));
+  teacherMarkers.forEach(function(m){
+    teacherMap.removeLayer(m);
+  });
   teacherMarkers=[];
 
   if(teacherRouteLine){
@@ -700,7 +906,7 @@ function renderTeacherMap(){
     teacherRouteLine=null;
   }
 
-  workingQuestions.forEach((q,i)=>{
+  workingQuestions.forEach(function(q,i){
     const marker=L.marker([q.lat,q.lng],{draggable:true}).addTo(teacherMap);
     marker.bindPopup((i+1)+". "+escapeHtml(q.title));
 
@@ -718,7 +924,9 @@ function renderTeacherMap(){
   });
 
   if(workingQuestions.length>=2){
-    teacherRouteLine=L.polyline(workingQuestions.map(q=>[q.lat,q.lng])).addTo(teacherMap);
+    teacherRouteLine=L.polyline(workingQuestions.map(function(q){
+      return [q.lat,q.lng];
+    })).addTo(teacherMap);
   }
 }
 
@@ -731,7 +939,7 @@ function renderStudentRouteInfo(){
     return;
   }
 
-  box.innerHTML=`<strong>Bana:</strong> ${escapeHtml(route.name)}<br><strong>Antal frågor:</strong> ${route.questions.length}`;
+  box.innerHTML="<strong>Bana:</strong> "+escapeHtml(route.name)+"<br><strong>Antal frågor:</strong> "+route.questions.length;
 }
 
 function startRound(){
@@ -757,7 +965,10 @@ function startRound(){
 
 function renderStudentIdentity(){
   const route=getStudentRoute();
-  document.getElementById("studentIdentity").innerHTML=`<p><strong>Namn:</strong> ${escapeHtml(document.getElementById("studentName").value)}</p><p><strong>Klass:</strong> ${escapeHtml(document.getElementById("studentClass").value)}</p><p><strong>Bana:</strong> ${route?escapeHtml(route.name):""}</p>`;
+  document.getElementById("studentIdentity").innerHTML=
+    "<p><strong>Namn:</strong> "+escapeHtml(document.getElementById("studentName").value)+"</p>"+
+    "<p><strong>Klass:</strong> "+escapeHtml(document.getElementById("studentClass").value)+"</p>"+
+    "<p><strong>Bana:</strong> "+(route?escapeHtml(route.name):"")+"</p>";
 }
 
 function startGps(){
@@ -859,7 +1070,9 @@ function renderStudentMap(){
   const route=getStudentRoute();
   if(!route)return;
 
-  studentMarkers.forEach(m=>studentMap.removeLayer(m));
+  studentMarkers.forEach(function(m){
+    studentMap.removeLayer(m);
+  });
   studentMarkers=[];
 
   if(studentUserMarker){
@@ -874,7 +1087,7 @@ function renderStudentMap(){
 
   const target=nextQuestion();
 
-  route.questions.forEach((q,i)=>{
+  route.questions.forEach(function(q,i){
     const answered=answers[q.id]!==undefined;
     const isTarget=target&&target.id===q.id;
 
@@ -946,15 +1159,15 @@ function renderStudentQuestions(){
     return;
   }
 
-  box.innerHTML=route.questions.map((q,i)=>{
+  box.innerHTML=route.questions.map(function(q,i){
     const answered=answers[q.id]!==undefined;
     const unlocked=isUnlocked(q);
 
-    return `<div class="card">
-      <h3>${i+1}. ${escapeHtml(q.title)}</h3>
-      <p><strong>Status:</strong> ${answered?"Besvarad":unlocked?"Upplåst":"Låst"}</p>
-      ${answered?renderSavedAnswer(q):unlocked?renderQuestion(q):renderLocked(q)}
-    </div>`;
+    return "<div class='card'>"+
+      "<h3>"+(i+1)+". "+escapeHtml(q.title)+"</h3>"+
+      "<p><strong>Status:</strong> "+(answered?"Besvarad":unlocked?"Upplåst":"Låst")+"</p>"+
+      (answered?renderSavedAnswer(q):unlocked?renderQuestion(q):renderLocked(q))+
+    "</div>";
   }).join("");
 }
 
@@ -964,12 +1177,17 @@ function isUnlocked(q){
 
 function renderLocked(q){
   let d="";
-  if(studentPosition)d="<p>Du är cirka <strong>"+formatDistance(distance(studentPosition.lat,studentPosition.lng,q.lat,q.lng))+"</strong> från frågan.</p>";
+  if(studentPosition){
+    d="<p>Du är cirka <strong>"+formatDistance(distance(studentPosition.lat,studentPosition.lng,q.lat,q.lng))+"</strong> från frågan.</p>";
+  }
   return "<div class='message warning'>Gå till platsen för att låsa upp frågan."+d+"</div>";
 }
 
 function renderQuestion(q){
-  return `<p><strong>${escapeHtml(q.text)}</strong></p><button class="answer-btn" onclick="answerQuestion('${q.id}', 0)">1: ${escapeHtml(q.options[0])}</button><button class="answer-btn" onclick="answerQuestion('${q.id}', 1)">2: ${escapeHtml(q.options[1])}</button><button class="answer-btn" onclick="answerQuestion('${q.id}', 2)">3: ${escapeHtml(q.options[2])}</button>`;
+  return "<p><strong>"+escapeHtml(q.text)+"</strong></p>"+
+    "<button class='answer-btn' onclick=\"answerQuestion('"+q.id+"', 0)\">1: "+escapeHtml(q.options[0])+"</button>"+
+    "<button class='answer-btn' onclick=\"answerQuestion('"+q.id+"', 1)\">2: "+escapeHtml(q.options[1])+"</button>"+
+    "<button class='answer-btn' onclick=\"answerQuestion('"+q.id+"', 2)\">3: "+escapeHtml(q.options[2])+"</button>";
 }
 
 function renderSavedAnswer(q){
@@ -986,7 +1204,9 @@ function answerQuestion(id,choice){
 
 function allAnswered(){
   const route=getStudentRoute();
-  return route&&route.questions.length>0&&route.questions.every(q=>answers[q.id]!==undefined);
+  return route&&route.questions.length>0&&route.questions.every(function(q){
+    return answers[q.id]!==undefined;
+  });
 }
 
 function buildResultText(){
@@ -998,7 +1218,7 @@ function buildResultText(){
   let correct=0;
   let lines=[];
 
-  route.questions.forEach((q,i)=>{
+  route.questions.forEach(function(q,i){
     const a=answers[q.id];
     const ok=a===q.correct;
     if(ok)correct++;
@@ -1016,18 +1236,17 @@ function buildResultText(){
     "Resultat: "+correct+" av "+route.questions.length,
     "Procent: "+percent+"%",
     "",
-    "Svar per fråga:",
-    ...lines
-  ].join("\n");
+    "Svar per fråga:"
+  ].concat(lines).join("\n");
 }
 
 function copyResult(){
   const text=buildResultText();
   if(!text)return;
 
-  navigator.clipboard.writeText(text).then(()=>{
+  navigator.clipboard.writeText(text).then(function(){
     alert("Resultatet är kopierat.");
-  },()=>{
+  },function(){
     const box=document.createElement("textarea");
     box.value=text;
     document.body.appendChild(box);
@@ -1064,38 +1283,38 @@ function renderResult(){
   const answeredCount=Object.keys(answers).length;
 
   if(!allAnswered()){
-    box.innerHTML=`<p><strong>Besvarade frågor:</strong> ${answeredCount} av ${route.questions.length}</p><p>Resultatet visas när alla frågor är besvarade.</p>`;
+    box.innerHTML="<p><strong>Besvarade frågor:</strong> "+answeredCount+" av "+route.questions.length+"</p><p>Resultatet visas när alla frågor är besvarade.</p>";
     return;
   }
 
   let correct=0;
   let review="";
 
-  route.questions.forEach((q,i)=>{
+  route.questions.forEach(function(q,i){
     const a=answers[q.id];
     const ok=a===q.correct;
     if(ok)correct++;
 
-    review+=`<div class="card ${ok?"ok":"bad"}">
-      <h3>${i+1}. ${escapeHtml(q.title)}</h3>
-      <p><strong>Fråga:</strong> ${escapeHtml(q.text)}</p>
-      <p><strong>Ditt svar:</strong> ${a+1}. ${escapeHtml(q.options[a])}</p>
-      <p><strong>Rätt svar:</strong> ${q.correct+1}. ${escapeHtml(q.options[q.correct])}</p>
-      <p><strong>Resultat:</strong> ${ok?"Rätt":"Fel"}</p>
-    </div>`;
+    review+="<div class='card "+(ok?"ok":"bad")+"'>"+
+      "<h3>"+(i+1)+". "+escapeHtml(q.title)+"</h3>"+
+      "<p><strong>Fråga:</strong> "+escapeHtml(q.text)+"</p>"+
+      "<p><strong>Ditt svar:</strong> "+(a+1)+". "+escapeHtml(q.options[a])+"</p>"+
+      "<p><strong>Rätt svar:</strong> "+(q.correct+1)+". "+escapeHtml(q.options[q.correct])+"</p>"+
+      "<p><strong>Resultat:</strong> "+(ok?"Rätt":"Fel")+"</p>"+
+    "</div>";
   });
 
   const percent=Math.round((correct/route.questions.length)*100);
 
-  box.innerHTML=`<div class="message ok">
-    <h3>Tipsrundan är klar!</h3>
-    <p><strong>Rätt:</strong> ${correct} av ${route.questions.length}</p>
-    <p><strong>Procent:</strong> ${percent}%</p>
-    <div class="result-actions">
-      <button class="success" onclick="copyResult()">Kopiera resultat</button>
-      <button class="secondary" onclick="emailResult()">Skicka resultat till lärare</button>
-    </div>
-  </div>${review}`;
+  box.innerHTML="<div class='message ok'>"+
+    "<h3>Tipsrundan är klar!</h3>"+
+    "<p><strong>Rätt:</strong> "+correct+" av "+route.questions.length+"</p>"+
+    "<p><strong>Procent:</strong> "+percent+"%</p>"+
+    "<div class='result-actions'>"+
+      "<button class='success' onclick='copyResult()'>Kopiera resultat</button>"+
+      "<button class='secondary' onclick='emailResult()'>Skicka resultat till lärare</button>"+
+    "</div>"+
+  "</div>"+review;
 }
 
 function clearAllRoutes(){
@@ -1123,14 +1342,16 @@ function distance(lat1,lng1,lat2,lng2){
   const R=6371000;
   const dLat=toRad(lat2-lat1);
   const dLng=toRad(lng2-lng1);
-  const a=Math.sin(dLat/2)**2+Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLng/2)**2;
+  const a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLng/2)*Math.sin(dLng/2);
   return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
 }
 
 function routeLength(questions){
   if(!questions||questions.length<2)return 0;
   let total=0;
-  for(let i=0;i<questions.length-1;i++)total+=distance(questions[i].lat,questions[i].lng,questions[i+1].lat,questions[i+1].lng);
+  for(let i=0;i<questions.length-1;i++){
+    total+=distance(questions[i].lat,questions[i].lng,questions[i+1].lat,questions[i+1].lng);
+  }
   return total;
 }
 
@@ -1149,14 +1370,21 @@ function clone(value){
 }
 
 function escapeHtml(text){
-  return String(text).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
+  return String(text)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
 }
 
 function encodeRoute(route){
   const json=JSON.stringify(route);
   const bytes=new TextEncoder().encode(json);
   let binary="";
-  bytes.forEach(b=>binary+=String.fromCharCode(b));
+  bytes.forEach(function(b){
+    binary+=String.fromCharCode(b);
+  });
   return btoa(binary).replaceAll("+","-").replaceAll("/","_").replaceAll("=","");
 }
 
