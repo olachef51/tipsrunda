@@ -41,6 +41,7 @@
     .result-actions{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
     .qr-wrap{background:white;display:inline-block;padding:12px;border-radius:12px;border:1px solid #ddd}
     .qr-wrap img{display:block;width:260px;height:260px;max-width:100%}
+    .small-note{font-size:14px;color:#374151}
     @media(max-width:700px){
       .grid-2{grid-template-columns:1fr}
       button{width:100%;margin:4px 0}
@@ -100,20 +101,30 @@
 
       <div id="saveStatus" class="statusbar">Ingen bana laddad.</div>
 
-      <h3>Dela bana till elever</h3>
-      <p>Elevlänken och QR-koden innehåller aktiv bana och lärarens e-post.</p>
+      <h3>Dela bana till elever med QR-kod</h3>
+      <p>Denna version använder en separat banfil. Det gör QR-länken kort och stabil.</p>
 
-      <button class="success" onclick="makeStudentLink()">Skapa elevlänk för aktiv bana</button>
-      <textarea id="studentLinkBox" class="copybox" readonly placeholder="Här kommer elevlänken..."></textarea>
+      <ol class="small-note">
+        <li>Spara banan som aktiv.</li>
+        <li>Klicka <strong>Exportera aktiv bana som elevfil</strong>.</li>
+        <li>Ladda upp filen, till exempel <strong>bana.json</strong>, i samma GitHub-repository som <strong>index.html</strong>.</li>
+        <li>Klicka <strong>Skapa elevlänk och QR-kod</strong>.</li>
+      </ol>
 
-      <button class="success" onclick="makeStudentQrCode()">Skapa QR-kod för aktiv bana</button>
+      <label>Filnamn för aktiv banfil på GitHub</label>
+      <input id="routeFileName" value="bana.json" placeholder="Exempel: bana.json">
+
+      <button class="success" onclick="exportActiveRouteFile()">Exportera aktiv bana som elevfil</button>
+      <button class="success" onclick="makeStudentLinkAndQr()">Skapa elevlänk och QR-kod</button>
       <button class="secondary" onclick="printQrCode()">Skriv ut QR-kod</button>
+
+      <textarea id="studentLinkBox" class="copybox" readonly placeholder="Här kommer elevlänken..."></textarea>
 
       <div id="qrCodeBox" class="message">
         <p>Här visas QR-koden när du skapar den.</p>
       </div>
 
-      <h3>Exportera och importera banor</h3>
+      <h3>Exportera och importera alla banor</h3>
       <button class="success" onclick="exportRoutes()">Exportera alla banor</button>
 
       <label>Importera banor från fil</label>
@@ -236,13 +247,14 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-const STORAGE_KEY = "digital_tipsrunda_clean_v6";
+const STORAGE_KEY = "digital_tipsrunda_clean_v8";
 const TEACHER_PASSWORD = "password1234";
 
 let state = loadState();
 let editingRouteId = null;
 let workingQuestions = [];
-let sharedRoute = readRouteFromUrl();
+let sharedRoute = null;
+let sharedRouteLoadError = "";
 let answers = {};
 let studentStarted = false;
 let studentPosition = null;
@@ -309,7 +321,7 @@ function showTeacher(){
   setTimeout(function(){
     initTeacherMap();
     renderTeacherMap();
-  }, 100);
+  },100);
 }
 
 function showStudentStart(){
@@ -327,7 +339,7 @@ function showStudentView(){
   setTimeout(function(){
     initStudentMap();
     renderStudentMap();
-  }, 100);
+  },100);
 }
 
 function renderSystemStatus(){
@@ -335,9 +347,15 @@ function renderSystemStatus(){
   const leafletStatus = typeof L !== "undefined" ? "Karta laddad." : "Karta kunde inte laddas. Kontrollera internetanslutning.";
   const route = getStudentRoute();
 
+  let routeText = route ? escapeHtml(route.name) : "Ingen aktiv bana";
+
+  if(sharedRouteLoadError){
+    routeText += "<br><span style='color:#991b1b;'>Fel vid laddning av banfil: " + escapeHtml(sharedRouteLoadError) + "</span>";
+  }
+
   box.innerHTML =
     "<strong>Status:</strong> " + leafletStatus +
-    "<br><strong>Aktiv bana:</strong> " + (route ? escapeHtml(route.name) : "Ingen aktiv bana");
+    "<br><strong>Elevbana:</strong> " + routeText;
 }
 
 function loginTeacher(){
@@ -433,7 +451,7 @@ function saveRoute(makeActive){
   document.getElementById("saveStatus").innerHTML = "Banan <strong>" + escapeHtml(name) + "</strong> är sparad" + activeText;
 }
 
-function loadRoute(id, showMessage){
+function loadRoute(id,showMessage){
   const route = getRoute(id);
   if(!route) return;
 
@@ -521,29 +539,60 @@ function routeForSharing(){
   const route = getActiveRoute();
   if(!route) return null;
 
-  return Object.assign({}, route, {
-    teacherEmail: route.teacherEmail || state.teacherEmail || ""
-  });
+  return {
+    id: route.id,
+    name: route.name,
+    teacherEmail: route.teacherEmail || state.teacherEmail || "",
+    questions: route.questions
+  };
 }
 
-function makeStudentLink(){
+function exportActiveRouteFile(){
   const route = routeForSharing();
 
   if(!route){
-    document.getElementById("studentLinkBox").value = "Ingen aktiv bana vald.";
-    return "";
+    document.getElementById("saveStatus").innerHTML = "Ingen aktiv bana vald.";
+    return;
   }
 
-  const data = encodeRoute(route);
+  const fileNameInput = document.getElementById("routeFileName").value.trim() || "bana.json";
+  const safeFileName = fileNameInput.endsWith(".json") ? fileNameInput : fileNameInput + ".json";
+
+  const exportData = {
+    app: "digital-tipsrunda-elevbana",
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    route: route
+  };
+
+  const json = JSON.stringify(exportData,null,2);
+  const blob = new Blob([json],{type:"application/json"});
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = safeFileName;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+
+  document.getElementById("saveStatus").innerHTML =
+    "Elevfilen <strong>" + escapeHtml(safeFileName) + "</strong> är exporterad. Ladda upp den i samma GitHub-repository som index.html.";
+}
+
+function makeStudentLink(){
+  const fileName = document.getElementById("routeFileName").value.trim() || "bana.json";
+  const cleanFileName = fileName.endsWith(".json") ? fileName : fileName + ".json";
   const cleanUrl = location.origin + location.pathname;
-  const link = cleanUrl + "#bana=" + data;
+  const link = cleanUrl + "?route=" + encodeURIComponent(cleanFileName);
 
   document.getElementById("studentLinkBox").value = link;
-  document.getElementById("saveStatus").innerHTML = "Elevlänk skapad. Kopiera länken eller skapa QR-kod.";
+  document.getElementById("saveStatus").innerHTML = "Elevlänk skapad. Kontrollera att <strong>" + escapeHtml(cleanFileName) + "</strong> är uppladdad på GitHub.";
   return link;
 }
 
-function makeStudentQrCode(){
+function makeStudentLinkAndQr(){
   const link = makeStudentLink();
   const box = document.getElementById("qrCodeBox");
 
@@ -557,12 +606,12 @@ function makeStudentQrCode(){
   box.innerHTML =
     "<h3>QR-kod till aktiv bana</h3>" +
     "<div class='qr-wrap'>" +
-      "<img id='qrImage' src='" + qrUrl + "' alt='QR-kod till tipsrundan' width='260' height='260' onerror=\"document.getElementById('qrCodeBox').innerHTML='<div class=&quot;message bad&quot;>QR-koden kunde inte laddas. Elevlänken kan vara för lång eller QR-tjänsten blockerad. Använd elevlänken ovan istället.</div>';\">" +
+      "<img id='qrImage' src='" + qrUrl + "' alt='QR-kod till tipsrundan' width='260' height='260' onerror=\"document.getElementById('qrCodeBox').innerHTML='<div class=&quot;message bad&quot;>QR-koden kunde inte laddas. QR-tjänsten kan vara blockerad. Använd elevlänken ovan istället.</div>';\">" +
     "</div>" +
     "<p>Eleverna skannar QR-koden för att öppna tipsrundan.</p>" +
-    "<p><strong>Länklängd:</strong> " + link.length + " tecken</p>";
+    "<p><strong>QR-länk:</strong> " + escapeHtml(link) + "</p>";
 
-  document.getElementById("saveStatus").innerHTML = "QR-kod skapad för aktiv bana.";
+  document.getElementById("saveStatus").innerHTML = "QR-kod skapad. Länken är kort eftersom banan ligger i separat JSON-fil.";
 }
 
 function printQrCode(){
@@ -576,7 +625,7 @@ function printQrCode(){
     return;
   }
 
-  const win = window.open("", "_blank");
+  const win = window.open("","_blank");
 
   win.document.write(
     "<!DOCTYPE html>" +
@@ -613,16 +662,16 @@ function exportRoutes(){
   }
 
   const exportData = {
-    app: "digital-tipsrunda",
-    version: 1,
-    exportedAt: new Date().toISOString(),
-    activeRouteId: state.activeRouteId,
-    teacherEmail: state.teacherEmail || "",
-    routes: state.routes
+    app:"digital-tipsrunda",
+    version:1,
+    exportedAt:new Date().toISOString(),
+    activeRouteId:state.activeRouteId,
+    teacherEmail:state.teacherEmail || "",
+    routes:state.routes
   };
 
-  const json = JSON.stringify(exportData, null, 2);
-  const blob = new Blob([json], {type:"application/json"});
+  const json = JSON.stringify(exportData,null,2);
+  const blob = new Blob([json],{type:"application/json"});
   const url = URL.createObjectURL(blob);
   const date = new Date().toISOString().slice(0,10);
   const filename = "tipsrundor-export-" + date + ".json";
@@ -658,6 +707,8 @@ function importRoutesFromFile(){
       if(imported && Array.isArray(imported.routes)){
         importedRoutes = imported.routes;
         if(imported.teacherEmail && !state.teacherEmail) state.teacherEmail = imported.teacherEmail;
+      }else if(imported && imported.route){
+        importedRoutes = [imported.route];
       }else if(Array.isArray(imported)){
         importedRoutes = imported;
       }else{
@@ -666,10 +717,10 @@ function importRoutesFromFile(){
 
       const validRoutes = importedRoutes.filter(isValidRoute).map(function(route){
         return {
-          id: "route_import_" + Date.now() + "_" + Math.random().toString(36).slice(2,8),
-          name: makeUniqueRouteName(route.name || "Importerad bana"),
-          teacherEmail: route.teacherEmail || state.teacherEmail || "",
-          questions: clone(route.questions)
+          id:"route_import_" + Date.now() + "_" + Math.random().toString(36).slice(2,8),
+          name:makeUniqueRouteName(route.name || "Importerad bana"),
+          teacherEmail:route.teacherEmail || state.teacherEmail || "",
+          questions:clone(route.questions)
         };
       });
 
@@ -959,7 +1010,11 @@ function renderStudentRouteInfo(){
   const route = getStudentRoute();
 
   if(!route){
-    box.innerHTML = "Ingen aktiv bana finns. Be läraren skapa en elevlänk eller välja aktiv bana.";
+    if(sharedRouteLoadError){
+      box.innerHTML = "<div class='message bad'>Banfilen kunde inte laddas: " + escapeHtml(sharedRouteLoadError) + "</div>";
+    }else{
+      box.innerHTML = "Ingen aktiv bana finns. Be läraren skapa en elevlänk eller välja aktiv bana.";
+    }
     return;
   }
 
@@ -1376,7 +1431,7 @@ function distance(lat1,lng1,lat2,lng2){
   const dLat = toRad(lat2-lat1);
   const dLng = toRad(lng2-lng1);
   const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng/2) * Math.sin(dLng/2);
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * 2 * Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
 }
 
 function routeLength(questions){
@@ -1414,16 +1469,44 @@ function escapeHtml(text){
     .replaceAll("'","&#039;");
 }
 
-function encodeRoute(route){
-  const json = JSON.stringify(route);
-  const bytes = new TextEncoder().encode(json);
-  let binary = "";
+async function loadSharedRouteFromUrl(){
+  const params = new URLSearchParams(location.search);
+  const routeFile = params.get("route");
 
-  bytes.forEach(function(b){
-    binary += String.fromCharCode(b);
-  });
+  if(!routeFile){
+    sharedRoute = null;
+    sharedRouteLoadError = "";
+    return;
+  }
 
-  return btoa(binary).replaceAll("+","-").replaceAll("/","_").replaceAll("=","");
+  try{
+    const cacheBust = routeFile.includes("?") ? "&t=" + Date.now() : "?t=" + Date.now();
+    const response = await fetch(routeFile + cacheBust);
+
+    if(!response.ok){
+      throw new Error("HTTP " + response.status + " - " + routeFile);
+    }
+
+    const data = await response.json();
+
+    let route = null;
+
+    if(data && data.route){
+      route = data.route;
+    }else if(data && data.name && Array.isArray(data.questions)){
+      route = data;
+    }
+
+    if(!isValidRoute(route)){
+      throw new Error("Banfilen har fel format.");
+    }
+
+    sharedRoute = route;
+    sharedRouteLoadError = "";
+  }catch(error){
+    sharedRoute = null;
+    sharedRouteLoadError = error.message || String(error);
+  }
 }
 
 function decodeRoute(data){
@@ -1457,7 +1540,9 @@ function readRouteFromUrl(){
   return decodeRoute(location.hash.replace("#bana=",""));
 }
 
-window.addEventListener("load",function(){
+window.addEventListener("load",async function(){
+  sharedRoute = readRouteFromUrl();
+  await loadSharedRouteFromUrl();
   renderSystemStatus();
   renderStudentRouteInfo();
   showStart();
