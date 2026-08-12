@@ -1,10 +1,10 @@
-<!-- start SEKTION 1: DIGITAL TIPSRUNDA STABIL GITHUB-BANFIL -->
+<!-- start SEKTION 1: DIGITAL TIPSRUNDA v5 PUBLIC URL FIX -->
 <!DOCTYPE html>
 <html lang="sv">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Digital tipsrunda</title>
+  <title>Digital tipsrunda v4</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <style>
     *{box-sizing:border-box}
@@ -54,6 +54,7 @@
 <body>
 <header>
   <h1>Digital tipsrunda</h1>
+  <p style="margin:4px 0 0;font-size:12px;opacity:.8">v4 – QR datamodell fixad</p>
   <p>Geotaggad tipsrunda med karta, GPS och självrättning</p>
 </header>
 
@@ -102,22 +103,16 @@
       <div id="saveStatus" class="statusbar">Ingen bana laddad.</div>
 
       <h3>Dela bana till elever med QR-kod</h3>
-      <p>Denna version använder en separat banfil på GitHub. Det gör QR-koden kort, ren och stabil.</p>
+      <p><strong>Ingen GitHub-uppladdning behövs.</strong> Själva banan packas och komprimeras direkt i elevlänken och QR-koden.</p>
 
       <ol class="small-note">
-        <li>Spara banan som aktiv.</li>
-        <li>Klicka <strong>Exportera aktiv bana som elevfil</strong>.</li>
-        <li>Ladda upp filen, till exempel <strong>bana.json</strong>, i samma GitHub-repository och samma mapp som <strong>index.html</strong>.</li>
-        <li>Klicka <strong>Testa banfil på GitHub</strong> och kontrollera att filen hittas.</li>
+        <li>Skapa banan och spara den som aktiv.</li>
         <li>Klicka <strong>Skapa elevlänk och QR-kod</strong>.</li>
+        <li>Eleven skannar QR-koden och kommer direkt till elevläget med rätt bana.</li>
       </ol>
 
-      <label>Filnamn för aktiv banfil på GitHub</label>
-      <input id="routeFileName" value="bana.json" placeholder="Exempel: bana.json">
-
-      <button class="success" onclick="exportActiveRouteFile()">Exportera aktiv bana som elevfil</button>
       <button class="success" onclick="makeStudentLinkAndQr()">Skapa elevlänk och QR-kod</button>
-      <button class="secondary" onclick="testRouteFileOnGithub()">Testa banfil på GitHub</button>
+      <button class="secondary" onclick="exportActiveRouteFile()">Spara aktiv bana som JSON-backup</button>
       <button class="secondary" onclick="printQrCode()">Skriv ut QR-kod</button>
 
       <textarea id="studentLinkBox" class="copybox" readonly placeholder="Här kommer elevlänken..."></textarea>
@@ -1628,7 +1623,7 @@ function renderSystemStatus(){
   let routeText = route ? escapeHtml(route.name) : "Ingen aktiv bana";
 
   if(sharedRouteLoadError){
-    routeText += "<br><span style='color:#991b1b;'>Fel vid laddning av banfil: " + escapeHtml(sharedRouteLoadError) + "</span>";
+    routeText += "<br><span style='color:#991b1b;'>Fel vid laddning av delad bana: " + escapeHtml(sharedRouteLoadError) + "</span>";
   }
 
   box.innerHTML =
@@ -1833,12 +1828,15 @@ function exportActiveRouteFile(){
     return;
   }
 
-  const fileNameInput = document.getElementById("routeFileName").value.trim() || "bana.json";
-  const safeFileName = fileNameInput.endsWith(".json") ? fileNameInput : fileNameInput + ".json";
+  const baseName = String(route.name || "tipsrunda")
+    .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/[^a-zA-Z0-9_-]+/g,"_")
+    .replace(/^_+|_+$/g,"") || "tipsrunda";
+  const safeFileName = baseName + ".json";
 
   const exportData = {
     app: "digital-tipsrunda-elevbana",
-    version: 1,
+    version: 2,
     exportedAt: new Date().toISOString(),
     route: route
   };
@@ -1846,7 +1844,6 @@ function exportActiveRouteFile(){
   const json = JSON.stringify(exportData,null,2);
   const blob = new Blob([json],{type:"application/json"});
   const url = URL.createObjectURL(blob);
-
   const link = document.createElement("a");
   link.href = url;
   link.download = safeFileName;
@@ -1856,81 +1853,148 @@ function exportActiveRouteFile(){
   URL.revokeObjectURL(url);
 
   document.getElementById("saveStatus").innerHTML =
-    "Elevfilen <strong>" + escapeHtml(safeFileName) + "</strong> är exporterad. Ladda upp den i samma GitHub-repository som index.html.";
+    "JSON-backup sparad som <strong>" + escapeHtml(safeFileName) + "</strong>. Filen behövs inte för elevernas QR-kod.";
 }
 
-function makeStudentLink(){
-  const fileName = document.getElementById("routeFileName").value.trim() || "bana.json";
-  const cleanFileName = fileName.endsWith(".json") ? fileName : fileName + ".json";
-  const cleanUrl = location.origin + location.pathname;
-  const link = cleanUrl + "?route=" + encodeURIComponent(cleanFileName);
+function compactRoute(route){
+  return {
+    n: route.name || "Tipsrunda",
+    e: route.teacherEmail || "",
+    q: (route.questions || []).map(function(q){
+      return [
+        q.title || "",
+        Number(q.lat),
+        Number(q.lng),
+        Number(q.radius || 25),
+        q.text || "",
+        Array.isArray(q.options) ? (q.options[0] || "") : (Array.isArray(q.answers) ? (q.answers[0] || "") : (q.a || "")),
+        Array.isArray(q.options) ? (q.options[1] || "") : (Array.isArray(q.answers) ? (q.answers[1] || "") : (q.b || "")),
+        Array.isArray(q.options) ? (q.options[2] || "") : (Array.isArray(q.answers) ? (q.answers[2] || "") : (q.c || "")),
+        Number(q.correct ?? q.correctIndex ?? 0)
+      ];
+    })
+  };
+}
 
+function expandCompactRoute(data){
+  if(!data || !Array.isArray(data.q)) return null;
+  const route = {
+    id: "shared_" + Date.now(),
+    name: data.n || "Tipsrunda",
+    teacherEmail: data.e || "",
+    questions: data.q.map(function(a,i){
+      return {
+        id: "shared_q_" + i,
+        title: a[0] || ("Fråga " + (i+1)),
+        lat: Number(a[1]),
+        lng: Number(a[2]),
+        radius: Number(a[3] || 25),
+        text: a[4] || "",
+        options: [a[5] || "",a[6] || "",a[7] || ""],
+        correct: Number(a[8] || 0)
+      };
+    })
+  };
+  return isValidRoute(route) ? route : null;
+}
+
+function bytesToBase64Url(bytes){
+  let binary = "";
+  const chunk = 0x8000;
+  for(let i=0;i<bytes.length;i+=chunk){
+    binary += String.fromCharCode.apply(null,bytes.subarray(i,Math.min(i+chunk,bytes.length)));
+  }
+  return btoa(binary).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/g,"");
+}
+
+function base64UrlToBytes(data){
+  let base64 = data.replace(/-/g,"+").replace(/_/g,"/");
+  while(base64.length % 4) base64 += "=";
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for(let i=0;i<binary.length;i++) bytes[i] = binary.charCodeAt(i);
+  return bytes;
+}
+
+async function compressText(text){
+  const bytes = new TextEncoder().encode(text);
+  if(typeof CompressionStream === "undefined") return {mode:"u",bytes:bytes};
+  const stream = new Blob([bytes]).stream().pipeThrough(new CompressionStream("deflate"));
+  const buf = await new Response(stream).arrayBuffer();
+  return {mode:"d",bytes:new Uint8Array(buf)};
+}
+
+async function decompressText(mode,bytes){
+  if(mode === "u") return new TextDecoder().decode(bytes);
+  if(mode !== "d" || typeof DecompressionStream === "undefined"){
+    throw new Error("Den här webbläsaren kan inte läsa den komprimerade elevlänken.");
+  }
+  const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("deflate"));
+  const buf = await new Response(stream).arrayBuffer();
+  return new TextDecoder().decode(buf);
+}
+
+async function encodeRouteForUrl(route){
+  const compact = compactRoute(route);
+  const packed = await compressText(JSON.stringify(compact));
+  return packed.mode + bytesToBase64Url(packed.bytes);
+}
+
+async function makeStudentLink(){
+  const route = routeForSharing();
+  if(!route || !isValidRoute(route)){
+    document.getElementById("saveStatus").innerHTML = "Ingen giltig aktiv bana finns att dela.";
+    return "";
+  }
+
+  const encoded = await encodeRouteForUrl(route);
+
+  // Självtest: verifiera att exakt samma QR-data kan läsas tillbaka innan länken visas.
+  const verifyRoute = await decodeCompressedRoute(encoded);
+  if(!verifyRoute || !Array.isArray(verifyRoute.questions) || verifyRoute.questions.length !== route.questions.length){
+    throw new Error("Självtest av QR-data misslyckades. QR-kod skapades inte.");
+  }
+
+  // QR-koden måste alltid peka på en webbadress som elevens mobil kan öppna.
+  // Om läraren kör HTML-filen lokalt från datorn används den publicerade appadressen.
+  const PUBLIC_APP_URL = "https://olachef51.github.io/tipsrunda/";
+  let cleanUrl;
+  if(location.protocol === "http:" || location.protocol === "https:"){
+    cleanUrl = location.origin + location.pathname;
+  }else{
+    cleanUrl = PUBLIC_APP_URL;
+  }
+  const link = cleanUrl.replace(/#.*$/, "") + "#r=" + encoded;
   document.getElementById("studentLinkBox").value = link;
-  document.getElementById("saveStatus").innerHTML =
-    "Elevlänk skapad med kort QR-länk. Kontrollera att <strong>" + escapeHtml(cleanFileName) + "</strong> ligger bredvid <strong>index.html</strong> på GitHub.";
   return link;
 }
 
-async function testRouteFileOnGithub(){
-  const fileName = document.getElementById("routeFileName").value.trim() || "bana.json";
-  const cleanFileName = fileName.endsWith(".json") ? fileName : fileName + ".json";
-  const cleanUrl = location.origin + location.pathname;
-  const testUrl = cleanUrl.replace(/[^\/]*$/, "") + cleanFileName;
+async function makeStudentLinkAndQr(){
   const box = document.getElementById("qrCodeBox");
-
-  box.innerHTML = "<div class='message'>Testar banfilen på GitHub:<br><strong>" + escapeHtml(testUrl) + "</strong></div>";
-
   try{
-    const response = await fetch(cleanFileName + "?t=" + Date.now());
-
-    if(!response.ok){
-      throw new Error("HTTP " + response.status + " - " + cleanFileName);
+    const link = await makeStudentLink();
+    if(!link){
+      box.innerHTML = "<div class='message bad'>Ingen elevlänk kunde skapas.</div>";
+      return;
     }
 
-    const data = await response.json();
-    const route = data && data.route ? data.route : data;
-
-    if(!isValidRoute(route)){
-      throw new Error("Banfilen finns, men JSON-formatet stämmer inte.");
-    }
-
-    box.innerHTML =
-      "<div class='message ok'><strong>Banfilen hittades och fungerar.</strong><br>" +
-      "Bana: " + escapeHtml(route.name) + "<br>Frågor: " + route.questions.length + "</div>";
-    document.getElementById("saveStatus").innerHTML = "Banfilen <strong>" + escapeHtml(cleanFileName) + "</strong> fungerar på GitHub.";
-  }catch(error){
-    box.innerHTML =
-      "<div class='message bad'><strong>Banfilen kunde inte laddas.</strong><br>" +
-      escapeHtml(error.message || String(error)) +
-      "<br><br>Lösning: exportera aktiv bana som <strong>" + escapeHtml(cleanFileName) + "</strong> och ladda upp filen bredvid <strong>index.html</strong> på GitHub.</div>";
-    document.getElementById("saveStatus").innerHTML = "Banfilen saknas eller har fel format.";
-  }
-}
-
-function makeStudentLinkAndQr(){
-  const link = makeStudentLink();
-  const box = document.getElementById("qrCodeBox");
-
-  if(!link){
-    box.innerHTML = "<div class='message bad'>Ingen elevlänk kunde skapas.</div>";
-    return;
-  }
-
-  try{
     box.innerHTML =
       "<h3>QR-kod till aktiv bana</h3>" +
-      "<div class='qr-wrap'>" +
-        "<canvas id='qrCanvas' width='260' height='260' aria-label='QR-kod till tipsrundan'></canvas>" +
-      "</div>" +
-      "<p>Eleverna skannar QR-koden för att öppna tipsrundan.</p>" +
-      "<p><strong>QR-länk:</strong> " + escapeHtml(link) + "</p>" +
-      "<p class='small-note'>QR-koden innehåller bara den korta länken till banfilen. Själva banan hämtas från GitHub.</p>";
+      "<div class='qr-wrap'><canvas id='qrCanvas' width='260' height='260' aria-label='QR-kod till tipsrundan'></canvas></div>" +
+      "<p>Eleven skannar QR-koden och kommer direkt till rätt bana.</p>" +
+      "<p class='small-note'><strong>Ingen JSON-fil behöver laddas upp.</strong> Banans data finns komprimerad i QR-länken.</p>";
 
     drawQrToCanvas(link,"qrCanvas",260);
-    document.getElementById("saveStatus").innerHTML = "QR-kod skapad. Länken är kort eftersom banan ligger i separat JSON-fil på GitHub.";
+    document.getElementById("saveStatus").innerHTML =
+      "QR-kod skapad. Banans " + routeForSharing().questions.length + " frågor följer med direkt i elevlänken.";
   }catch(error){
-    box.innerHTML =
-      "<div class='message bad'>QR-koden kunde inte skapas lokalt: " + escapeHtml(error.message || String(error)) + "<br>Använd elevlänken ovan istället.</div>";
+    const msg = error && error.message ? error.message : String(error);
+    let help = "";
+    if(/overflow|length/i.test(msg)){
+      help = "<br><br>Banans text är för stor för en enda QR-kod. Kortare fråge- eller svarstexter kan behövas.";
+    }
+    box.innerHTML = "<div class='message bad'><strong>QR-koden kunde inte skapas.</strong><br>" + escapeHtml(msg) + help + "</div>";
+    document.getElementById("saveStatus").innerHTML = "QR-koden kunde inte skapas.";
   }
 }
 
@@ -2373,7 +2437,7 @@ function renderStudentRouteInfo(){
 
   if(!route){
     if(sharedRouteLoadError){
-      box.innerHTML = "<div class='message bad'>Banfilen kunde inte laddas: " + escapeHtml(sharedRouteLoadError) + "</div>";
+      box.innerHTML = "<div class='message bad'>Den delade banan kunde inte laddas: " + escapeHtml(sharedRouteLoadError) + "</div>";
     }else{
       box.innerHTML = "Ingen aktiv bana finns. Be läraren skapa en elevlänk eller välja aktiv bana.";
     }
@@ -2831,86 +2895,60 @@ function escapeHtml(text){
     .replaceAll("'","&#039;");
 }
 
-async function loadSharedRouteFromUrl(){
-  const params = new URLSearchParams(location.search);
-  const routeFile = params.get("route");
+async function decodeCompressedRoute(data){
+  if(!data || data.length < 2) return null;
+  try{
+    const mode = data.charAt(0);
+    const bytes = base64UrlToBytes(data.slice(1));
+    const json = await decompressText(mode,bytes);
+    return expandCompactRoute(JSON.parse(json));
+  }catch(e){
+    sharedRouteLoadError = e.message || String(e);
+    return null;
+  }
+}
 
-  if(!routeFile){
-    sharedRoute = null;
-    sharedRouteLoadError = "";
+function decodeLegacyRoute(data){
+  try{
+    let base64 = data.replaceAll("-","+").replaceAll("_","/");
+    while(base64.length % 4) base64 += "=";
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for(let i=0;i<binary.length;i++) bytes[i] = binary.charCodeAt(i);
+    const json = new TextDecoder().decode(bytes);
+    const route = JSON.parse(json);
+    return isValidRoute(route) ? route : null;
+  }catch(e){
+    return null;
+  }
+}
+
+async function loadSharedRouteFromUrl(){
+  sharedRoute = null;
+  sharedRouteLoadError = "";
+
+  if(location.hash.startsWith("#r=")){
+    sharedRoute = await decodeCompressedRoute(location.hash.slice(3));
+    if(!sharedRoute && !sharedRouteLoadError) sharedRouteLoadError = "Banan i QR-koden kunde inte läsas.";
     return;
   }
 
-  try{
-    const cacheBust = routeFile.includes("?") ? "&t=" + Date.now() : "?t=" + Date.now();
-    const response = await fetch(routeFile + cacheBust);
-
-    if(!response.ok){
-      if(response.status === 404){
-        throw new Error("HTTP 404 - Banfilen hittades inte: " + routeFile + ". Ladda upp filen bredvid index.html på GitHub.");
-      }
-      throw new Error("HTTP " + response.status + " - " + routeFile);
-    }
-
-    const data = await response.json();
-
-    let route = null;
-
-    if(data && data.route){
-      route = data.route;
-    }else if(data && data.name && Array.isArray(data.questions)){
-      route = data;
-    }
-
-    if(!isValidRoute(route)){
-      throw new Error("Banfilen finns, men har fel JSON-format.");
-    }
-
-    sharedRoute = route;
-    sharedRouteLoadError = "";
-  }catch(error){
-    sharedRoute = null;
-    sharedRouteLoadError = error.message || String(error);
+  // Bakåtkompatibilitet med äldre elevlänkar.
+  if(location.hash.startsWith("#bana=")){
+    sharedRoute = decodeLegacyRoute(location.hash.slice(6));
+    if(!sharedRoute) sharedRouteLoadError = "Den äldre elevlänken kunde inte läsas.";
   }
 }
 
-function decodeRoute(data){
-  try{
-    let base64 = data.replaceAll("-","+").replaceAll("_","/");
-
-    while(base64.length % 4){
-      base64 += "=";
-    }
-
-    const binary = atob(base64);
-    const bytes = new Uint8Array(binary.length);
-
-    for(let i=0;i<binary.length;i++){
-      bytes[i] = binary.charCodeAt(i);
-    }
-
-    const json = new TextDecoder().decode(bytes);
-    const route = JSON.parse(json);
-
-    if(route && route.name && Array.isArray(route.questions)){
-      return route;
-    }
-  }catch(e){}
-
-  return null;
-}
-
-function readRouteFromUrl(){
-  if(!location.hash || !location.hash.startsWith("#bana=")) return null;
-  return decodeRoute(location.hash.replace("#bana=",""));
-}
-
 window.addEventListener("load",async function(){
-  sharedRoute = null;
   await loadSharedRouteFromUrl();
   renderSystemStatus();
   renderStudentRouteInfo();
-  showStart();
+  if(sharedRoute){
+    showStudentStart();
+  }else{
+    showStart();
+  }
 });
 </script>
 </body>
