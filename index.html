@@ -1523,6 +1523,9 @@ module.exports = QRCode;
 const STORAGE_KEY = "digital_tipsrunda_clean_v8";
 const TEACHER_PASSWORD = "password1234";
 
+// Inbyggd publicerad elevbana för dagens körning.
+const EMBEDDED_ROUTE = {"id":"route_1786518046886","name":"Uppstarts Quiz","teacherEmail":"jesper.isaksson@malmo.skola.se","questions":[{"id":"q_1786513081406","title":"Fråga 1","lat":55.605178,"lng":13.018219,"radius":25,"text":"Varför är det viktigt att inte överfylla en stekpanna?","options":["Det gör maten sötare","Det gör att råvarorna får mindre kontakt med värmen och kan börja koka i stället för att brynas/Stekas","Det gör att råvarorna alltid blir råa"],"correct":1},{"id":"q_1786513331265","title":"Carolibron","lat":55.606184,"lng":13.014164,"radius":25,"text":"Vad innebär blanchering?","options":["Långsam stekning i fett","Lång kokning utan avkylning","Kort kokning/upphettning, ofta följd av snabb avkylning"],"correct":2},{"id":"q_1786513599969","title":"Paulibron","lat":55.604269,"lng":13.010623,"radius":25,"text":"Vilken utrustning används för att skära mycket tunna och jämna skivor av exempelvis potatis?","options":["Ballongvisp","Durkslag","Mandolin"],"correct":2},{"id":"q_1786513739787","title":"Amiralsbron","lat":55.602524,"lng":13.005559,"radius":25,"text":"Vad är skillnaden mellan att sjuda och att koka kraftigt?","options":["Sjudning sker lugnare och vid lägre temperatur","Kokning sker alltid under 50 °C","Det är exakt samma metod"],"correct":0},{"id":"q_1786513852107","title":"Kaptensbron","lat":55.601851,"lng":13.003446,"radius":25,"text":"Vad är huvudsyftet med att reducera en sås?","options":["Att kyla ner såsen","Att avdunsta vätska och koncentrera smaken","Att späda ut smaken"],"correct":0},{"id":"q_1786513998022","title":"Davidhallsbron","lat":55.601344,"lng":13.000881,"radius":25,"text":"Vilken metod passar bäst för en seg köttdetalj som ska bli mör genom lång tillagning?","options":["Blanchering","Pochering","Bräsering"],"correct":2},{"id":"q_1786514094981","title":"Morescobron","lat":55.60108,"lng":12.999542,"radius":25,"text":"Vad är Maillardreaktionen?","options":["En kemisk reaktion som ger brynta ytor och nya smakämnen","När stärkelse löses upp i kallt vatten","När protein fryser"],"correct":0},{"id":"q_1786514318866","title":"Dödens plats","lat":55.601633,"lng":12.995882,"radius":25,"text":"Vilket redskap används bäst för att kontrollera innertemperaturen på kött?","options":["Palettkniv","Mandolin","Digital termometer"],"correct":2},{"id":"q_1786516829520","title":"Parkbron","lat":55.601645,"lng":12.992224,"radius":25,"text":"Vad är den viktigaste skillnaden mellan att steka och att pochera?","options":["Stekning sker alltid i vatten, medan pochering sker i olja","Pochering används endast för kött","Stekning sker i torr värme eller fett, medan pochering sker varsamt i vätska"],"correct":2},{"id":"q_1786516950825","title":"Kommendantbron","lat":55.602821,"lng":12.989295,"radius":25,"text":"Varför ska man ofta låta kött vila efter tillagning?","options":["För att temperaturen och köttsaften ska hinna fördelas innan köttet skärs upp","För att köttet ska bli rått igen","För att all vätska ska försvinna"],"correct":0},{"id":"q_1786517072266","title":"Var är vi nu?","lat":55.603537,"lng":12.989474,"radius":25,"text":"Vad heter bron vi nu befinner oss vid?","options":["Öresundsbron","Slottsbron","Trägårdsbron"],"correct":2},{"id":"q_1786517301905","title":"Slottsbron","lat":55.605221,"lng":12.990625,"radius":25,"text":"Vad menas med ergonomi?","options":["Att arbeta så snabbt som möjligt utan pauser","Att arbeta på ett sätt som minskar belastning och risken för skador","Att använda så många köksredskap som möjligt"],"correct":1},{"id":"q_1786517464962","title":"Hovrättsbron","lat":55.606683,"lng":12.992114,"radius":25,"text":"Vad är korskontaminering?","options":["När råvaror tillagas tillsammans i samma Stekpanna eller gryta","När två olika kryddor blandas på ett felaktigt sätt","När bakterier eller andra smittämnen förs över från en råvara eller yta till en annan"],"correct":2},{"id":"q_1786517641252","title":"Birgit Nilssons Bro","lat":55.607175,"lng":12.994921,"radius":25,"text":"En vass kniv behöver aldrig rengöras","options":["En vass kniv ger bättre kontroll och kräver mindre kraft vid skärning","En vass kniv gör att råvarorna automatiskt tillagas snabbare","En vass kniv behöver aldrig rengöras"],"correct":0},{"id":"q_1786517769511","title":"Lilla Torg","lat":55.605099,"lng":12.998741,"radius":25,"text":"Vad används en chinois främst till i ett professionellt kök?","options":["Att hacka grönsaker","Att sila och finfiltrera såser, fonder och andra vätskor","Att mäta temperaturen på kött"],"correct":1},{"id":"q_1786518010617","title":"Gustavadolfs torg SISTA FRÅGAN STANNA KVAR HÄR","lat":55.602956,"lng":12.999314,"radius":25,"text":"Varför är det viktigt att organisera sin arbetsstation innan man börjar laga mat?","options":["För att minska onödiga rörelser och arbeta effektivare och säkrare","För att slippa använda skärbräda","För att maten automatiskt ska få bättre smak"],"correct":0}]};
+
 let state = loadState();
 let editingRouteId = null;
 let workingQuestions = [];
@@ -1652,7 +1655,7 @@ function getActiveRoute(){
 }
 
 function getStudentRoute(){
-  return sharedRoute || getActiveRoute();
+  return sharedRoute || EMBEDDED_ROUTE || getActiveRoute();
 }
 
 function saveTeacherEmail(){
@@ -1941,22 +1944,13 @@ async function encodeRouteForUrl(route){
 }
 
 async function makeStudentLink(){
-  const route = routeForSharing();
+  const route = getStudentRoute();
   if(!route || !isValidRoute(route)){
-    document.getElementById("saveStatus").innerHTML = "Ingen giltig aktiv bana finns att dela.";
+    document.getElementById("saveStatus").innerHTML = "Ingen giltig elevbana finns att dela.";
     return "";
   }
 
-  const encoded = await encodeRouteForUrl(route);
-
-  // Självtest: verifiera att exakt samma QR-data kan läsas tillbaka innan länken visas.
-  const verifyRoute = await decodeCompressedRoute(encoded);
-  if(!verifyRoute || !Array.isArray(verifyRoute.questions) || verifyRoute.questions.length !== route.questions.length){
-    throw new Error("Självtest av QR-data misslyckades. QR-kod skapades inte.");
-  }
-
-  // QR-koden måste alltid peka på en webbadress som elevens mobil kan öppna.
-  // Om läraren kör HTML-filen lokalt från datorn används den publicerade appadressen.
+  // Kort QR-länk: själva banan ligger inbyggd i index.html.
   const PUBLIC_APP_URL = "https://olachef51.github.io/tipsrunda/";
   let cleanUrl;
   if(location.protocol === "http:" || location.protocol === "https:"){
@@ -1964,7 +1958,7 @@ async function makeStudentLink(){
   }else{
     cleanUrl = PUBLIC_APP_URL;
   }
-  const link = cleanUrl.replace(/#.*$/, "") + "#r=" + encoded;
+  const link = cleanUrl.replace(/[?#].*$/, "") + "?elev=1";
   document.getElementById("studentLinkBox").value = link;
   return link;
 }
@@ -1982,11 +1976,11 @@ async function makeStudentLinkAndQr(){
       "<h3>QR-kod till aktiv bana</h3>" +
       "<div class='qr-wrap'><canvas id='qrCanvas' width='260' height='260' aria-label='QR-kod till tipsrundan'></canvas></div>" +
       "<p>Eleven skannar QR-koden och kommer direkt till rätt bana.</p>" +
-      "<p class='small-note'><strong>Ingen JSON-fil behöver laddas upp.</strong> Banans data finns komprimerad i QR-länken.</p>";
+      "<p class='small-note'><strong>Ingen JSON-fil behövs.</strong> Banans data ligger redan inbyggd i den publicerade index.html-filen.</p>";
 
     drawQrToCanvas(link,"qrCanvas",260);
     document.getElementById("saveStatus").innerHTML =
-      "QR-kod skapad. Banans " + routeForSharing().questions.length + " frågor följer med direkt i elevlänken.";
+      "QR-kod skapad. Den korta länken öppnar den inbyggda banan med " + getStudentRoute().questions.length + " frågor.";
   }catch(error){
     const msg = error && error.message ? error.message : String(error);
     let help = "";
@@ -2942,6 +2936,10 @@ async function loadSharedRouteFromUrl(){
 
 window.addEventListener("load",async function(){
   await loadSharedRouteFromUrl();
+  // Om ingen bana kom via en äldre/komprimerad länk används den inbyggda Jesper-banan.
+  if(!sharedRoute && EMBEDDED_ROUTE && isValidRoute(EMBEDDED_ROUTE)){
+    sharedRoute = clone(EMBEDDED_ROUTE);
+  }
   renderSystemStatus();
   renderStudentRouteInfo();
   if(sharedRoute){
